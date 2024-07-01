@@ -14,7 +14,7 @@ app.use(express.static(path.join(import.meta.url, "public")));
 app.use("/", indexRouter);
 
 app.use(function (req, res, next) {
-  next(createError(404));
+  res.send(404);
 });
 
 app.listen(3001, async () => {});
