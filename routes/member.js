@@ -1,7 +1,8 @@
 import express from "express";
-import member from "./member.js";
-
 const router = express.Router();
-router.use("/member", member);
+
+router.get("/login", function (req, res, next) {
+  res.send("test");
+});
 
 export default router;
