@@ -17,9 +17,8 @@ app.use(async (req, res, next) => {
     if (req.headers.authrozation === "") {
       throw new Error("비정상적인 접근입니다.");
     }
-
-    if (req.method !== "GET") {
-      const [token] = req.headers.authrozation.replace("Bearer ", "");
+    if (req.method !== "GET" && req.path !== "/member/login") {
+      const token = req.headers.authorization.split(" ")[1];
       JwtStrateGy.validateJwt(token);
     }
     return true;
