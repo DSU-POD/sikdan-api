@@ -1,5 +1,5 @@
 import express from "express";
-import { MemberService } from "../services/member/member.service";
+import { MemberService } from "../services/member/member.service.js";
 const router = express.Router();
 const memberService = new MemberService();
 
