@@ -34,19 +34,23 @@ export class MemberService {
     if (memberInfo === null) {
       throw new Error("비밀번호 정보가 없습니다."); //아이디 존재, 비밀번호 불일치
     } else {
-      return { userId: idInfo.userId, password: this.password, nickname: idInfo.nickname }; //아이디, 비밀번호 일치
+      return {
+        userId: idInfo.userId,
+        password: this.password,
+        nickname: idInfo.nickname,
+      }; //아이디, 비밀번호 일치
     }
   }
 
-  async findId(userId) {
+  async findId(value, column) {
     //아이디 존재 확인
     const findInfo = await memberModel.findOne({
       where: {
-        userId: this.userId,
+        [column]: value,
       },
     });
     if (findInfo === null) {
-      return null;
+      throw new Error("회원정보가 존재하지 않습니다.");
     }
     return findInfo;
   }
@@ -61,19 +65,6 @@ export class MemberService {
     });
     if (findInfo === null) {
       return null;
-    }
-    return findInfo;
-  }
-
-  async find_Id(userId) {
-    //아이디 찾기
-    const findInfo = await memberModel.findOne({
-      where: {
-        email: this.email,
-      },
-    });
-    if (findInfo === null) {
-      throw new Error();
     }
     return findInfo;
   }
