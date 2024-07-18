@@ -1,8 +1,6 @@
 import { error } from "console";
-import MemberModel from "../../models/member.model";
-import e from "express";
-const crypto = require("crypto");
-const memberModel = new MemberModel();
+import MemberModel from "../../models/member.model.js";
+import crypto from "crypto";
 
 export class MemberService {
   constructor() {}
