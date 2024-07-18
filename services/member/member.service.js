@@ -22,9 +22,6 @@ export class MemberService {
 
     // 먼저 아이디가 있는지 확인
     const idInfo = await this.findId(userId);
-    if (idInfo === null) {
-      throw new Error("아이디 정보가 없습니다."); //아이디 불일치
-    }
 
     // 패스워드 암호화
     const { encryptPassword } = this.encryptPassword(password, idInfo.salt);
@@ -32,7 +29,7 @@ export class MemberService {
     // 아이디와 비밀번호로 계정 확인
     const memberInfo = await this.findMember(userId, encryptPassword);
     if (memberInfo === null) {
-      throw new Error("비밀번호 정보가 없습니다."); //아이디 존재, 비밀번호 불일치
+      throw new Error("비밀번호 불일치"); //아이디 존재, 비밀번호 불일치
     } else {
       return {
         userId: idInfo.userId,
@@ -43,16 +40,16 @@ export class MemberService {
   }
 
   async findId(value, column) {
-    //아이디 존재 확인
+    //아이디 찾기
     const findInfo = await memberModel.findOne({
       where: {
         [column]: value,
       },
     });
     if (findInfo === null) {
-      throw new Error("회원정보가 존재하지 않습니다.");
+      throw new Error();
     }
-    return findInfo;
+    return findInfo(userId); // 무조건 userId 반환
   }
 
   async findMember(userId, password) {
@@ -67,5 +64,20 @@ export class MemberService {
       return null;
     }
     return findInfo;
+  }
+
+  async findPassword(password) {
+    //비밀번호 찾기
+    const findInfo = await memberModel.findOne({
+      where: {
+        userId: this.userId,
+        email: this.email,
+        password: this.password,
+      },
+    });
+    if (findInfo === null) {
+      throw new Error();
+    }
+    return findInfo(password);
   }
 }
