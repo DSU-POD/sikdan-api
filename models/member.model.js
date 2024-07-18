@@ -1,4 +1,4 @@
-import { DataTypes, Model, UUIDV4 } from "sequelize";
+import { DataTypes, UUIDV4 } from "sequelize";
 import { sequelize } from "./index.js";
 
 const MemberModel = sequelize.define(
@@ -8,6 +8,10 @@ const MemberModel = sequelize.define(
       type: DataTypes.CHAR,
       defaultValue: UUIDV4(),
       primaryKey: true,
+    },
+    userId: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     email: {
       type: DataTypes.STRING,
