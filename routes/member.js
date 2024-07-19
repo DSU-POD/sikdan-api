@@ -5,10 +5,14 @@ const memberService = new MemberService();
 
 router.post("/login", async function (req, res, next) {
   try {
-    const result = await memberService.login();
+    if (!req.body.userId || !req.body.password) {
+      throw new Error("올바르지 않은 접근입니다.");
+    }
+    const { userId, password } = req.body;
+    const result = await memberService.login(userId, password);
     res.status(200).send("로그인 성공 하였습니다.");
   } catch (e) {
-    res.status(400).send("로그인 실패 하였습니다.");
+    next(e);
   }
 });
 
@@ -17,7 +21,7 @@ router.get("/find_id", async function (req, res, next) {
     const result = await memberService.findId();
     res.status(200).send("아이디는" + userId + "입니다.");
   } catch (e) {
-    res.status(400).send("해당 이메일로 등록된 계정이 없습니다.");
+    next(e);
   }
 });
 
@@ -26,7 +30,7 @@ router.get("/find_password", async function (req, res, next) {
     const result = await memberService.findPassword();
     res.status(200).send("비밀번호는" + password + "입니다.");
   } catch (e) {
-    res.status(400).send("해당 입력정보로 등록된 계정이 없습니다.");
+    next(e);
   }
 });
 
