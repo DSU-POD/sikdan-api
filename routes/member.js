@@ -34,4 +34,15 @@ router.get("/find_password", async function (req, res, next) {
   }
 });
 
+router.post("/register/complete", async (req, res, next) => {
+  try {
+    const { registerData } = req.body;
+
+    await memberService.register(registerData);
+    next("회원가입 되었습니다.");
+  } catch (e) {
+    next(e);
+  }
+});
+
 export default router;

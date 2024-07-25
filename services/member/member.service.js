@@ -77,4 +77,49 @@ export class MemberService {
     }
     return findInfo(password);
   }
+
+  async register(registerData) {
+    const {
+      userId,
+      password,
+      email,
+      nickname,
+      gender,
+      age,
+      height,
+      weight,
+      goal,
+      trainer_yn,
+    } = registerData;
+
+    const findInfo = await MemberModel.findOne({
+      where: {
+        userId,
+      },
+    });
+    if (findInfo !== null) {
+      throw new Error("이미 가입된 회원입니다.");
+    }
+
+    const { encryptPassword, salt } = this.encryptPassword(password);
+
+    const result = await MemberModel.create({
+      userId,
+      password: encryptPassword,
+      salt,
+      email,
+      nickname,
+      gender,
+      age,
+      height,
+      weight,
+      goal,
+      trainer_yn,
+    });
+
+    if (!result) {
+      throw new Error("회원가입에 실패하였습니다.");
+    }
+    return true;
+  }
 }

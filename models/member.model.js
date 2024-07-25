@@ -37,6 +37,22 @@ const MemberModel = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    gender: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    age: {
+      type: DataTypes.NUMBER,
+      allowNull: false,
+    },
+    weight: {
+      type: DataTypes.NUMBER,
+      allowNull: false,
+    },
+    height: {
+      type: DataTypes.NUMBER,
+      allowNull: false,
+    },
   },
   {
     sequelize,
