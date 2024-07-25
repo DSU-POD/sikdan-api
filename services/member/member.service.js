@@ -77,25 +77,35 @@ export class MemberService {
   }
 
   async register(registerData) {
-    const {
-      userId,
-      password,
-      email,
-      nickname,
-      gender,
-      age,
-      height,
-      weight,
-      goal,
-      trainer_yn,
-    } = registerData;
+    const { userId, password, email, nickname, gender, age, height, weight, goal, trainer_yn } = registerData;
 
-    const findInfo = await MemberModel.findOne({
+    const checkId = await MemberModel.findOne({
+      //id 중복 체크
       where: {
         userId,
       },
     });
-    if (findInfo !== null) {
+    if (checkId !== null) {
+      throw new Error("이미 가입된 회원입니다.");
+    }
+
+    const chechNickName = await MemberModel.findOne({
+      //nickname 중복 체크
+      where: {
+        nickname,
+      },
+    });
+    if (chechNickName !== null) {
+      throw new Error("이미 가입된 회원입니다.");
+    }
+
+    const checkEmail = await MemberModel.findOne({
+      //email 중복 체크
+      where: {
+        email,
+      },
+    });
+    if (checkEmail !== null) {
       throw new Error("이미 가입된 회원입니다.");
     }
 
