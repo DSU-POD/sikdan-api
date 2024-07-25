@@ -62,14 +62,12 @@ export class MemberService {
     return findInfo;
   }
 
-  async findPassword(findData) {
-    const { userId, email, password } = findData;
+  async findPassword(userId, email) {
     //비밀번호 찾기
     const findInfo = await MemberModel.findOne({
       where: {
         userId,
         email,
-        password,
       },
     });
     if (findInfo === null) {
