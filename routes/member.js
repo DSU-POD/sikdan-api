@@ -10,7 +10,7 @@ router.post("/login", async function (req, res, next) {
     }
     const { userId, password } = req.body;
     const result = await memberService.login(userId, password);
-    res.status(200).send("로그인 성공 하였습니다.");
+    next("로그인 성공 하였습니다.");
   } catch (e) {
     next(e);
   }

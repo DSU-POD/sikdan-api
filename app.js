@@ -41,19 +41,30 @@ app.use(function (req, res, next) {
   res.send(404);
 });
 
-// 에러 전역처리
+// 에러, 응답 전역처리
 app.use((err, req, res, next) => {
-  const error = true;
-  const { status } = err;
-  let message = err.message;
-  // 문법오류 처리
-  if (err instanceof ReferenceError === true) {
-    message = "오류가 발생하였습니다.";
+  //에러 처리
+  if (err instanceof Error) {
+    const error = true;
+    const { status } = err;
+    let message = err.message;
+    // 문법오류 처리
+    if (err instanceof ReferenceError === true) {
+      message = "오류가 발생하였습니다.";
+    }
+    res.status(err.status || 500).send({
+      error,
+      message,
+    });
+  } else {
+    //응답 처리
+    const result = "success";
+    const message = err;
+    res.status(200).send({
+      result,
+      message,
+    });
   }
-  res.status(err.status || 500).send({
-    error,
-    message,
-  });
 });
 
 app.listen(3001, async () => {});
