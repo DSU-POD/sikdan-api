@@ -19,7 +19,7 @@ router.post("/login", async function (req, res, next) {
 router.get("/find_id", async function (req, res, next) {
   try {
     const result = await memberService.findId();
-    res.status(200).send("아이디는" + userId + "입니다.");
+    next("아이디" + userId + "입니다.");
   } catch (e) {
     next(e);
   }
@@ -28,7 +28,7 @@ router.get("/find_id", async function (req, res, next) {
 router.get("/find_password", async function (req, res, next) {
   try {
     const result = await memberService.findPassword();
-    res.status(200).send("비밀번호는" + password + "입니다.");
+    next("비밀번호는" + password + "입니다.");
   } catch (e) {
     next(e);
   }
