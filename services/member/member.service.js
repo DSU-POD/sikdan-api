@@ -44,18 +44,17 @@ export class MemberService {
     }
   }
 
-  async findId(name, email) {
+  async findId(email) {
     //아이디 찾기
     const findInfo = await MemberModel.findOne({
       where: {
-        name,
         email,
       },
     });
     if (findInfo === null) {
-      throw new Error("아이디 혹은 비밀번호를 확인해주세요.");
+      throw new Error("회원 정보가 없습니다.");
     }
-    return findInfo;
+    return findInfo.userId;
   }
 
   async findMember(userId, password) {
@@ -101,18 +100,7 @@ export class MemberService {
   }
 
   async register(registerData) {
-    const {
-      userId,
-      password,
-      email,
-      nickname,
-      gender,
-      age,
-      height,
-      weight,
-      goal,
-      trainer_yn,
-    } = registerData;
+    const { userId, password, email, nickname, gender, age, height, weight, goal, trainer_yn } = registerData;
 
     const checkId = await MemberModel.findOne({
       //id 중복 체크
