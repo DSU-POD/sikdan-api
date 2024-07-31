@@ -1,4 +1,3 @@
-import { UPDATE } from "sequelize/lib/query-types";
 import MemberModel from "../../models/member.model.js";
 import crypto from "crypto";
 
