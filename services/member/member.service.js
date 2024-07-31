@@ -18,7 +18,16 @@ export class MemberService {
     // db 통신해서 로그인 처리 해주는 코드
 
     // 먼저 아이디가 있는지 확인
-    const idInfo = await this.findId(userId, "userId");
+    const idInfo = await MemberModel.findOne({
+      where: {
+        userId,
+      },
+    });
+
+    if (idInfo === null) {
+      throw new Error("아이디 혹은 비밀번호를 확인해주세요.");
+    }
+
     // 패스워드 암호화
     const { encryptPassword } = this.encryptPassword(password, idInfo.salt);
 
@@ -35,7 +44,21 @@ export class MemberService {
     }
   }
 
-  async findId(value, column) {
+  async findId(name, email) {
+    //아이디 찾기
+    const findInfo = await MemberModel.findOne({
+      where: {
+        name,
+        email,
+      },
+    });
+    if (findInfo === null) {
+      throw new Error("아이디 혹은 비밀번호를 확인해주세요.");
+    }
+    return findInfo;
+  }
+
+  async findId(value, column, isFindPage) {
     //아이디 찾기
     const findInfo = await MemberModel.findOne({
       where: {
@@ -91,7 +114,18 @@ export class MemberService {
   }
 
   async register(registerData) {
-    const { userId, password, email, nickname, gender, age, height, weight, goal, trainer_yn } = registerData;
+    const {
+      userId,
+      password,
+      email,
+      nickname,
+      gender,
+      age,
+      height,
+      weight,
+      goal,
+      trainer_yn,
+    } = registerData;
 
     const checkId = await MemberModel.findOne({
       //id 중복 체크
