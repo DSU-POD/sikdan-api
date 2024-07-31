@@ -1,3 +1,4 @@
+import { UPDATE } from "sequelize/lib/query-types";
 import MemberModel from "../../models/member.model.js";
 import crypto from "crypto";
 
@@ -71,9 +72,23 @@ export class MemberService {
       },
     });
     if (findInfo === null) {
-      throw new Error("회원 정보가 없습니다.");
+      //없으면 랜덤 패스워드 생성
+      const randomPassword = Math.random().toString(36).substring(2, 12);
+      const { encryptPassword, salt } = encryptPassword(randomPassword, salt);
+      await MemberModel.update(
+        {
+          encryptPassword: password,
+          salt,
+        },
+        {
+          where: {
+            userId,
+            email,
+          },
+        }
+      );
     }
-    return findInfo(password);
+    return true;
   }
 
   async register(registerData) {
