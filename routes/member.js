@@ -1,5 +1,6 @@
 import express from "express";
 import { MemberService } from "../services/member/member.service.js";
+import { error } from "winston";
 const router = express.Router();
 const memberService = new MemberService();
 
@@ -30,6 +31,8 @@ router.post("/find_password", async function (req, res, next) {
     if (req.body.userId && req.body.email) {
       const result = await memberService.findPassword();
       next("회원정보에 입력한 이메일로 임시 비밀번호를 발송해드렸습니다.");
+    } else {
+      throw new Error();
     }
   } catch (e) {
     next(e);
