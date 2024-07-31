@@ -58,19 +58,6 @@ export class MemberService {
     return findInfo;
   }
 
-  async findId(value, column, isFindPage) {
-    //아이디 찾기
-    const findInfo = await MemberModel.findOne({
-      where: {
-        [column]: value,
-      },
-    });
-    if (findInfo === null) {
-      throw new Error("아이디 혹은 비밀번호를 확인해주세요.");
-    }
-    return findInfo;
-  }
-
   async findMember(userId, password) {
     //아이디와 비밀번호 확인
     const findInfo = await MemberModel.findOne({
