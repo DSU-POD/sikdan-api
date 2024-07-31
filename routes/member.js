@@ -16,20 +16,20 @@ router.post("/login", async function (req, res, next) {
   }
 });
 
-router.get("/find_id", async function (req, res, next) {
+router.post("/find_id", async function (req, res, next) {
   try {
     const result = await memberService.findId();
-    next("아이디" + userId + "입니다.");
+    next("회원정보에 입력한 이메일로 아이디를 발송해드렸습니다.");
   } catch (e) {
     next(e);
   }
 });
 
-router.get("/find_password", async function (req, res, next) {
+router.post("/find_password", async function (req, res, next) {
   try {
     if (req.body.userId && req.body.email) {
       const result = await memberService.findPassword();
-      next("비밀번호는" + password + "입니다.");
+      next("회원정보에 입력한 이메일로 임시 비밀번호를 발송해드렸습니다.");
     }
   } catch (e) {
     next(e);
