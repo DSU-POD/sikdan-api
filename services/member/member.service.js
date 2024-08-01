@@ -1,5 +1,6 @@
 import MemberModel from "../../models/member.model.js";
 import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 export class MemberService {
   constructor() {}
@@ -95,12 +96,29 @@ export class MemberService {
           },
         }
       );
+
+      this.sendMail(
+        email,
+        "[MealMate] 임시 비밀번호 보내드립니다.",
+        `임시 비밀번호 : ${randomPassword}`
+      );
     }
     return true;
   }
 
   async register(registerData) {
-    const { userId, password, email, nickname, gender, age, height, weight, goal, trainer_yn } = registerData;
+    const {
+      userId,
+      password,
+      email,
+      nickname,
+      gender,
+      age,
+      height,
+      weight,
+      goal,
+      trainer_yn,
+    } = registerData;
 
     const checkId = await MemberModel.findOne({
       //id 중복 체크
@@ -152,5 +170,30 @@ export class MemberService {
       throw new Error("회원가입에 실패하였습니다.");
     }
     return true;
+  }
+
+  sendMail(to, subject, text) {
+    const transporter = nodemailer.createTransport({
+      service: process.env.MAIL_TYPE,
+      auth: {
+        user: process.env.MAIL_ADDRESS, // 나의 (작성자) 이메일 주소
+        pass: process.env.MAIL_PASSWORD, // 이메일의 비밀번호
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.MAIL_FROM, // 작성자
+      to, // 수신자
+      subject, // 메일 제목
+      text, // 메일 내용
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        throw new Error("이메일 발송에 실패하였습니다.");
+      }
+
+      return true;
+    });
   }
 }
