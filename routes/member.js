@@ -1,6 +1,5 @@
 import express from "express";
 import { MemberService } from "../services/member/member.service.js";
-import { error } from "winston";
 const router = express.Router();
 const memberService = new MemberService();
 
