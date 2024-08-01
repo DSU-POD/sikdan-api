@@ -72,10 +72,11 @@ app.use((err, req, res, next) => {
   } else {
     //응답 처리
     const result = "success";
-    const message = err;
+    const { message, data } = err;
     res.status(200).send({
       result,
       message,
+      data: data ?? "",
     });
   }
 });

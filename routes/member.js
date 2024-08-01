@@ -10,7 +10,10 @@ router.post("/login", async function (req, res, next) {
     }
     const { userId, password } = req.body;
     const token = await memberService.login(userId, password);
-    next(token);
+    next({
+      data: token,
+      message: "로그인에 성공하였습니다.",
+    });
   } catch (e) {
     next(e);
   }
