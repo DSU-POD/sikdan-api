@@ -1,6 +1,7 @@
 import MemberModel from "../../models/member.model.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import JwtStrateGy from "../../auth/jwt.strategy.js";
 
 export class MemberService {
   constructor() {}
@@ -35,13 +36,14 @@ export class MemberService {
     // 아이디와 비밀번호로 계정 확인
     const memberInfo = await this.findMember(userId, encryptPassword);
     if (memberInfo === null) {
-      throw new Error("비밀번호 불일치"); //아이디 존재, 비밀번호 불일치
+      throw new Error("아이디 혹은 비밀번호를 확인해주세요."); //아이디 존재, 비밀번호 불일치
     } else {
-      return {
-        userId: idInfo.userId,
-        password: this.password,
-        nickname: idInfo.nickname,
-      }; //아이디, 비밀번호 일치
+      const { userId, email } = memberInfo;
+      const token = JwtStrateGy.createJwtToken({
+        userId,
+        email,
+      });
+      return token; //아이디, 비밀번호 일치
     }
   }
 

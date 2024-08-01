@@ -9,8 +9,8 @@ router.post("/login", async function (req, res, next) {
       throw new Error("올바르지 않은 접근입니다.");
     }
     const { userId, password } = req.body;
-    const result = await memberService.login(userId, password);
-    next("로그인 성공 하였습니다.");
+    const token = await memberService.login(userId, password);
+    next(token);
   } catch (e) {
     next(e);
   }
