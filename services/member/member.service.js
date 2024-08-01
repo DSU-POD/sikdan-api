@@ -83,20 +83,12 @@ export class MemberService {
     if (findInfo !== null) {
       //있으면 랜덤 패스워드 생성
       const randomPassword = Math.random().toString(36).substring(2, 12);
-      const { encryptPassword, salt } = encryptPassword(randomPassword, salt);
-      await MemberModel.update(
-        {
-          encryptPassword: password,
-          salt,
-        },
-        {
-          where: {
-            userId,
-            email,
-          },
-        }
-      );
-
+      const { encryptPassword, salt } = this.encryptPassword(randomPassword);
+      await findInfo.save({
+        password: encryptPassword,
+        salt,
+      });
+      console.log("test");
       this.sendMail(
         email,
         "[MealMate] 임시 비밀번호 보내드립니다.",
@@ -180,7 +172,6 @@ export class MemberService {
         pass: process.env.MAIL_PASSWORD, // 이메일의 비밀번호
       },
     });
-
     const mailOptions = {
       from: process.env.MAIL_FROM, // 작성자
       to, // 수신자
