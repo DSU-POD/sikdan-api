@@ -79,8 +79,8 @@ export class MemberService {
         email,
       },
     });
-    if (findInfo === null) {
-      //없으면 랜덤 패스워드 생성
+    if (findInfo !== null) {
+      //있으면 랜덤 패스워드 생성
       const randomPassword = Math.random().toString(36).substring(2, 12);
       const { encryptPassword, salt } = encryptPassword(randomPassword, salt);
       await MemberModel.update(
