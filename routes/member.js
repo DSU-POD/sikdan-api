@@ -18,7 +18,8 @@ router.post("/login", async function (req, res, next) {
 
 router.post("/find_id", async function (req, res, next) {
   try {
-    const result = await memberService.findId();
+    const { email } = req.body;
+    await memberService.findId(email);
     next("회원정보에 입력한 이메일로 아이디를 발송해드렸습니다.");
   } catch (e) {
     next(e);

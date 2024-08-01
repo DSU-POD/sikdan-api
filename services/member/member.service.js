@@ -52,8 +52,12 @@ export class MemberService {
         email,
       },
     });
-
-    this.sendMail(email, "[MealMate] 아이디 보내드립니다.", `아이디 : ${userId}`);
+    const { userId } = findInfo;
+    this.sendMail(
+      email,
+      "[MealMate] 아이디 보내드립니다.",
+      `아이디 : ${userId}`
+    );
 
     if (findInfo === null) {
       throw new Error("회원 정보가 없습니다.");
@@ -100,13 +104,28 @@ export class MemberService {
         }
       );
 
-      this.sendMail(email, "[MealMate] 임시 비밀번호 보내드립니다.", `임시 비밀번호 : ${randomPassword}`);
+      this.sendMail(
+        email,
+        "[MealMate] 임시 비밀번호 보내드립니다.",
+        `임시 비밀번호 : ${randomPassword}`
+      );
     }
     return true;
   }
 
   async register(registerData) {
-    const { userId, password, email, nickname, gender, age, height, weight, goal, trainer_yn } = registerData;
+    const {
+      userId,
+      password,
+      email,
+      nickname,
+      gender,
+      age,
+      height,
+      weight,
+      goal,
+      trainer_yn,
+    } = registerData;
 
     const checkId = await MemberModel.findOne({
       //id 중복 체크
