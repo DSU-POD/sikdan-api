@@ -28,10 +28,12 @@ app.use(express.static(path.join(import.meta.url, "public")));
 // jwt middleware
 app.use(async (req, res, next) => {
   try {
+    // jwt 검사 예외 경로
     const exceptPath = [
       "/member/login",
       "/member/find_id",
       "/member/find_password",
+      "/member/register/complete",
     ];
     if (req.method !== "GET" && !exceptPath.includes(req.path)) {
       if (req.headers.authrozation === "") {
