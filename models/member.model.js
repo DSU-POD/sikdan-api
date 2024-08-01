@@ -22,7 +22,7 @@ const MemberModel = sequelize.define(
       allowNull: false,
     },
     trainer_yn: {
-      type: DataTypes.TINYINT,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     nickname: {
