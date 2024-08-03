@@ -1,4 +1,4 @@
-import MemberModel from "../../models/member.model.js";
+import MemberModel from "../../models/Member.model.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import JwtStrateGy from "../../auth/jwt.strategy.js";
