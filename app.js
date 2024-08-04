@@ -72,8 +72,9 @@ app.use((err, req, res, next) => {
   } else {
     //응답 처리
     const result = "success";
+    const statusCode = req.method === "POST" ? 201 : 200;
     const { message, data } = err;
-    res.status(200).send({
+    res.status(statusCode).send({
       result,
       message,
       data: data ?? "",
