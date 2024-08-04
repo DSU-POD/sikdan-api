@@ -35,7 +35,7 @@ app.use(async (req, res, next) => {
       "/member/find_password",
       "/member/register/complete",
     ];
-    if (req.method !== "GET" && !exceptPath.includes(req.path)) {
+    if (!exceptPath.includes(req.path)) {
       if (req.headers.authrozation === "") {
         throw new Error("비정상적인 접근입니다.");
       }
