@@ -1,10 +1,12 @@
-import MemberModel from "../../models/Member.model.js";
+import db from "../../models/index.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import JwtStrateGy from "../../auth/jwt.strategy.js";
 
 export class MemberService {
-  constructor() {}
+  constructor() {
+    this.MemberModel = db.MemberModel;
+  }
 
   //비밀번호 암호화
   encryptPassword(password, salt) {
@@ -20,7 +22,7 @@ export class MemberService {
     // db 통신해서 로그인 처리 해주는 코드
 
     // 먼저 아이디가 있는지 확인
-    const idInfo = await MemberModel.findOne({
+    const idInfo = await this.MemberModel.findOne({
       where: {
         userId,
       },
@@ -49,7 +51,7 @@ export class MemberService {
 
   async findId(email) {
     //아이디 찾기
-    const findInfo = await MemberModel.findOne({
+    const findInfo = await this.MemberModel.findOne({
       where: {
         email,
       },
@@ -69,7 +71,7 @@ export class MemberService {
 
   async findMember(userId, password) {
     //아이디와 비밀번호 확인
-    const findInfo = await MemberModel.findOne({
+    const findInfo = await this.MemberModel.findOne({
       where: {
         userId,
         password,
@@ -83,7 +85,7 @@ export class MemberService {
 
   async findPassword(userId, email) {
     //비밀번호 찾기
-    const findInfo = await MemberModel.findOne({
+    const findInfo = await this.MemberModel.findOne({
       where: {
         userId,
         email,
@@ -93,7 +95,7 @@ export class MemberService {
       //있으면 랜덤 패스워드 생성
       const randomPassword = Math.random().toString(36).substring(2, 12);
       const { encryptPassword, salt } = encryptPassword(randomPassword, salt);
-      await MemberModel.update(
+      await this.MemberModel.update(
         {
           encryptPassword: password,
           salt,
@@ -129,7 +131,7 @@ export class MemberService {
       trainer_yn,
     } = registerData;
 
-    const checkId = await MemberModel.findOne({
+    const checkId = await this.MemberModel.findOne({
       //id 중복 체크
       where: {
         userId,
@@ -139,7 +141,7 @@ export class MemberService {
       throw new Error("이미 가입된 회원입니다.");
     }
 
-    const chechNickName = await MemberModel.findOne({
+    const chechNickName = await this.MemberModel.findOne({
       //nickname 중복 체크
       where: {
         nickname,
@@ -149,7 +151,7 @@ export class MemberService {
       throw new Error("이미 가입된 회원입니다.");
     }
 
-    const checkEmail = await MemberModel.findOne({
+    const checkEmail = await this.MemberModel.findOne({
       //email 중복 체크
       where: {
         email,
@@ -161,7 +163,7 @@ export class MemberService {
 
     const { encryptPassword, salt } = this.encryptPassword(password);
 
-    const result = await MemberModel.create({
+    const result = await this.MemberModel.create({
       userId,
       password: encryptPassword,
       salt,

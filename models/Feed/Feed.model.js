@@ -1,61 +1,37 @@
+// models/Feed/Feed.model.js
 import { DataTypes, UUIDV4 } from "sequelize";
-import { sequelize } from "../index.js";
 
-const FeedModel = sequelize.define(
-  "FeedModel",
-  {
-    id: {
-      type: DataTypes.CHAR,
-      defaultValue: UUIDV4(),
-      primaryKey: true,
+const FeedModel = (sequelize, DataTypes) => {
+  const Feed = sequelize.define(
+    "FeedModel",
+    {
+      id: {
+        type: DataTypes.CHAR,
+        defaultValue: UUIDV4,
+        primaryKey: true,
+      },
+      // 기타 필드
     },
-    memberId: {
-      type: DataTypes.CHAR,
-      allowNull: false,
-    },
-    dietId: {
-      type: DataTypes.CHAR,
-      allowNull: false,
-    },
-    subject: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    contents: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    ai_feedback: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    likeNum: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    commentNum: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: "FeedModel",
-    tableName: "Feed",
-    timestamp: true,
-  }
-);
+    {
+      sequelize,
+      modelName: "FeedModel",
+      tableName: "Feed",
+      timestamps: true,
+    }
+  );
 
-FeedModel.associate = ({ MemberModel, LikeModel, DietModel }) => {
-  FeedModel.hasOne(MemberModel, {
-    foreignKey: "memberId",
-  });
-  FeedModel.hasMany(LikeModel, {
-    foreignKey: "feedId",
-  });
-  FeedModel.hasMany(DietModel, {
-    foreignKey: "feedId",
-  });
+  Feed.associate = (models) => {
+    Feed.belongsTo(models.MemberModel, {
+      foreignKey: "memberId",
+      as: "memberFeed",
+    });
+    Feed.hasMany(models.LikeModel, {
+      foreignKey: "feedId",
+      as: "feedLike",
+    });
+  };
+
+  return Feed;
 };
 
 export default FeedModel;

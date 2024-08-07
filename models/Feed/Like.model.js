@@ -1,38 +1,44 @@
-import { DataTypes, UUIDV4 } from "sequelize";
-import { sequelize } from "../index.js";
+import { UUIDV4 } from "sequelize";
 
-const LikeModel = sequelize.define(
-  "LikeModel",
-  {
-    id: {
-      type: DataTypes.CHAR,
-      defaultValue: UUIDV4(),
-      primaryKey: true,
+const LikeModel = (sequelize, DataTypes) => {
+  const Like = sequelize.define(
+    "LikeModel",
+    {
+      id: {
+        type: DataTypes.CHAR,
+        defaultValue: UUIDV4(),
+        primaryKey: true,
+      },
+      memberId: {
+        type: DataTypes.CHAR,
+        allowNull: false,
+      },
+      feedId: {
+        type: DataTypes.CHAR,
+        allowNull: false,
+      },
     },
-    memberId: {
-      type: DataTypes.CHAR,
-      allowNull: false,
-    },
-    feedId: {
-      type: DataTypes.CHAR,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: "LikeModel",
-    tableName: "Like",
-    timestamp: true,
-  }
-);
+    {
+      sequelize,
+      modelName: "LikeModel",
+      tableName: "Like",
+      timestamp: true,
+    }
+  );
 
-LikeModel.associate = ({ MemberModel }) => {
-  LikeModel.hasOne(MemberModel, {
-    foreignKey: "memberId",
-  });
-  LikeModel.hasOne(MemberModel, {
-    foreignKey: "memberId",
-  });
+  Like.associate = ({ MemberModel, FeedModel }) => {
+    Like.belongsTo(MemberModel, {
+      foreignKey: "memberId",
+      as: "memberLike",
+    });
+    Like.belongsTo(FeedModel, {
+      foreignKey: "feedId",
+      sourceKey: "id",
+      as: "feedLike",
+    });
+  };
+
+  return Like;
 };
 
 export default LikeModel;

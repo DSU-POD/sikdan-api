@@ -23,26 +23,40 @@ if (dbConfig.use_env_variable) {
   );
 }
 
-const initModels = async () => {
-  const modelFiles = fs.readdirSync(__dirname).filter((file) => {
-    return (
-      file.indexOf(".") !== 0 &&
-      file !== basename &&
-      file.slice(-3) === ".model.js"
-    );
-  });
+const getModelFiles = (dir) => {
+  const files = [];
 
-  for (const file of modelFiles) {
-    const { default: model } = await import(path.join(__dirname, file));
-    const initializedModel = model(sequelize, Sequelize.DataTypes);
-    db[initializedModel.name] = initializedModel;
-  }
-
-  Object.keys(db).forEach((modelName) => {
-    if (db[modelName].associate) {
-      db[modelName].associate(db);
+  fs.readdirSync(dir).forEach((file) => {
+    const fullPath = path.join(dir, file);
+    if (fs.statSync(fullPath).isDirectory()) {
+      files.push(...getModelFiles(fullPath)); // 하위 디렉토리 재귀 호출
+    } else if (file.endsWith(".model.js")) {
+      files.push(fullPath);
     }
   });
+
+  return files;
+};
+
+const initModels = async () => {
+  try {
+    const modelFiles = getModelFiles(__dirname);
+    console.log(modelFiles);
+    for (const file of modelFiles) {
+      const relativePath = path.relative(__dirname, file).replace(/\\/g, "/"); // 상대 경로로 변환
+      const { default: model } = await import(`./${relativePath}`);
+      const initializedModel = model(sequelize, Sequelize.DataTypes);
+      db[initializedModel.name] = initializedModel;
+    }
+
+    Object.keys(db).forEach((modelName) => {
+      if (db[modelName].associate) {
+        db[modelName].associate(db);
+      }
+    });
+  } catch (error) {
+    console.error("Error initializing models:", error);
+  }
 };
 
 await initModels();
@@ -50,4 +64,4 @@ await initModels();
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-export { db, sequelize, Sequelize };
+export default db;
