@@ -62,6 +62,13 @@ const MemberModel = (sequelize, DataTypes) => {
     }
   );
 
+  Member.associate = (models) => {
+    Member.hasMany(models.FeedModel, {
+      foreignKey: "memberId",
+      sourceKey: "id",
+      as: "memberFeed",
+    });
+  };
   return Member;
 };
 

@@ -3,6 +3,8 @@ import db from "../../models/index.js";
 export default class FeedService {
   constructor() {
     this.FeedModel = db.FeedModel;
+    this.LikeModel = db.LikeModel;
+    this.MemberModel = db.MemberModel;
   }
 
   async getFeed(id) {
@@ -11,6 +13,18 @@ export default class FeedService {
       where: {
         id,
       },
+      include: [
+        {
+          model: this.LikeModel,
+          as: "feedLike",
+          attributes: ["memberId"],
+        },
+        {
+          model: this.MemberModel,
+          as: "memberFeed",
+          attributes: ["userId", "nickname"],
+        },
+      ],
     });
     if (feedInfo === null) {
       throw new Error("404 err");
