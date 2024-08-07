@@ -11,7 +11,7 @@ const app = express();
 //app.use(logger("dev"));
 app.use(
   cors({
-    origin: "*",
+    origin: process.env.FRONT_ORIGIN,
   })
 );
 app.use(express.json());
