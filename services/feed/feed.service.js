@@ -1,11 +1,13 @@
-import FeedModel from "../../models/Feed/Feed.model.js";
+import db from "../../models/index.js";
 
 export default class FeedService {
-  constructor() {}
+  constructor() {
+    this.FeedModel = db.FeedModel;
+  }
 
   async getFeed(id) {
     // 피드 아이디가 있는지 확인
-    const feedInfo = await FeedModel.findOne({
+    const feedInfo = await this.FeedModel.findOne({
       where: {
         id,
       },
@@ -17,13 +19,13 @@ export default class FeedService {
   }
 
   async deleteFeed(id) {
-    const feedInfo = await FeedModel.findOne({
+    const feedInfo = await this.FeedModel.findOne({
       where: {
         id,
       },
     });
     const { FeedModel } = findInfo;
-    const feeddes = await FeedModel.destroy({
+    const feedDes = await this.FeedModel.destroy({
       where: {
         FeedModel,
       },
