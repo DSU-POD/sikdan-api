@@ -41,7 +41,6 @@ const getModelFiles = (dir) => {
 const initModels = async () => {
   try {
     const modelFiles = getModelFiles(__dirname);
-    console.log(modelFiles);
     for (const file of modelFiles) {
       const relativePath = path.relative(__dirname, file).replace(/\\/g, "/"); // 상대 경로로 변환
       const { default: model } = await import(`./${relativePath}`);

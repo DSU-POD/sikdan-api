@@ -1,5 +1,5 @@
 // models/Feed/Feed.model.js
-import { DataTypes, UUIDV4 } from "sequelize";
+import { UUIDV4 } from "sequelize";
 
 const FeedModel = (sequelize, DataTypes) => {
   const Feed = sequelize.define(
@@ -23,10 +23,12 @@ const FeedModel = (sequelize, DataTypes) => {
   Feed.associate = (models) => {
     Feed.belongsTo(models.MemberModel, {
       foreignKey: "memberId",
+      sourceKey: "id",
       as: "memberFeed",
     });
     Feed.hasMany(models.LikeModel, {
       foreignKey: "feedId",
+      sourceKey: "id",
       as: "feedLike",
     });
   };
