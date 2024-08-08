@@ -10,6 +10,34 @@ const FeedModel = (sequelize, DataTypes) => {
         defaultValue: UUIDV4,
         primaryKey: true,
       },
+      memberId: {
+        type: DataTypes.CHAR,
+        allowNull: false,
+      },
+      dietId: {
+        type: DataTypes.CHAR,
+        allowNull: false,
+      },
+      subject: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      contents: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      ai_feedback: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      likeNum: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      commentNum: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       // 기타 필드
     },
     {
