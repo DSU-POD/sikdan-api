@@ -6,10 +6,61 @@ export default class FeedService {
     this.LikeModel = db.LikeModel;
     this.MemberModel = db.MemberModel;
   }
+  async like(memberId, feedId) {
+    const feedInfo = await this.FeedModel.getOne({
+      where: {
+        memberId,
+        id: feedId,
+      },
+    });
+    if (feedInfo === null) {
+      throw new Error();
+    }
+    // 좋아요가 이미 있는지 검사
+    const { memberId } = feedInfo;
+    if ({ memberId } != null) {
+      throw new Error();
+    }
+    // like 테이블에 create
+    const likeResult = await this.LikeModel.create({ memberId, feedId });
+    if (likeResult === null) {
+      throw new Error();
+    }
+    //Feed 테이블에 likeNum 에 +1 업데이트
+    await feedInfo.increment("LikeNum", { by: 1 });
+
+    return true;
+  }
+
+  async likeCancel(memberId, feedId) {
+    const feedInfo = await this.FeedModel.getOne({
+      where: {
+        memberId,
+        id: feedId,
+      },
+    });
+    if (feedInfo === null) {
+      throw new Error();
+    }
+    // 좋아요가 없는지 검사
+    const { memberId } = feedInfo;
+    if (({ memberId } = null)) {
+      throw new Error();
+    }
+    // like 테이블에 destroy
+    const likeResult = await this.LikeModel.destroy({ memberId, feedId });
+    if (likeResult !== null) {
+      throw new Error();
+    }
+    //Feed 테이블에 likeNum 에 -1 업데이트
+    await feedInfo.increment("LikeNum", { by: -1 });
+
+    return true;
+  }
 
   async getFeed(id) {
     // 피드 아이디가 있는지 확인
-    const feedInfo = await this.FeedModel.findOne({
+    const feedInfo = await this.FeedModel.getOne({
       where: {
         id,
       },
@@ -27,7 +78,7 @@ export default class FeedService {
       ],
     });
     if (feedInfo === null) {
-      throw new Error("404 err");
+      throw new Error();
     }
     return feedInfo;
   }
@@ -38,20 +89,13 @@ export default class FeedService {
       offset = 10 * (page - 1);
     }
     // 피드 아이디가 있는지 확인
-    const feedInfo = await this.FeedModel.findAll({
+    const feedInfo = await this.FeedModel.getAll({
       limit: 10,
       offset,
       where: {
         type,
       },
-      attributes: [
-        "id",
-        "subject",
-        "contents",
-        "ai_feedback",
-        "likeNum",
-        "commentNum",
-      ],
+      attributes: ["id", "subject", "contents", "ai_feedback", "likeNum", "commentNum"],
       include: [
         {
           model: this.LikeModel,
@@ -66,22 +110,18 @@ export default class FeedService {
       ],
     });
     if (feedInfo === null) {
-      throw new Error("404 err");
+      throw new Error();
     }
     return feedInfo;
   }
 
   async deleteFeed(id) {
-    const feedInfo = await this.FeedModel.findOne({
+    const feedInfo = await this.FeedModel.getOne({
       where: {
         id,
       },
     });
-    const { FeedModel } = findInfo;
-    const feedDes = await this.FeedModel.destroy({
-      where: {
-        FeedModel,
-      },
-    });
+
+    await feedInfo.destroy();
   }
 }
