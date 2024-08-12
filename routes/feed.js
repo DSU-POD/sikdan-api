@@ -6,7 +6,22 @@ const feedService = new FeedService();
 router.post("/like", async (req, res, next) => {});
 router.delete("/likeCancel", async (req, res, next) => {});
 
-router.get("/list", async (req, res, next) => {});
+router.get("/list/:page", async (req, res, next) => {
+  try {
+    const { page } = req.params;
+    const { type } = req.query;
+    if (!page || (type !== "expert" && type !== "people")) {
+      throw new Error("비정상적인 접근입니다.");
+    }
+    const feedList = await feedService.getFeedList(page, type);
+    next({
+      data: feedList,
+      message: "정상적으로 조회되었습니다.",
+    });
+  } catch (e) {
+    next(e);
+  }
+});
 router.get("/view/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
