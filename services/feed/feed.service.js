@@ -7,24 +7,25 @@ export default class FeedService {
     this.MemberModel = db.MemberModel;
   }
   async like(memberId, feedId) {
-    const feedInfo = await this.FeedModel.getOne({
+    const likeInfo = await this.LikeModel.findOne({
+      where: {
+        memberId,
+        feedId,
+      },
+    });
+    if (likeInfo !== null) {
+      throw new Error("이미 좋아요를 했습니다.");
+    }
+    const feedInfo = await this.FeedModel.findOne({
       where: {
         memberId,
         id: feedId,
       },
     });
-    if (feedInfo === null) {
-      throw new Error();
-    }
-    // 좋아요가 이미 있는지 검사
-    const { memberId } = feedInfo;
-    if ({ memberId } != null) {
-      throw new Error();
-    }
     // like 테이블에 create
     const likeResult = await this.LikeModel.create({ memberId, feedId });
     if (likeResult === null) {
-      throw new Error();
+      throw new Error("알 수 없는 오류가 발생하였습니다.");
     }
     //Feed 테이블에 likeNum 에 +1 업데이트
     await feedInfo.increment("LikeNum", { by: 1 });
@@ -33,27 +34,28 @@ export default class FeedService {
   }
 
   async likeCancel(memberId, feedId) {
-    const feedInfo = await this.FeedModel.getOne({
+    const likeInfo = await this.LikeModel.findOne({
+      where: {
+        memberId,
+        feedId,
+      },
+    });
+    if (likeInfo === null) {
+      throw new Error("이미 좋아요 취소 처리 되었습니다.");
+    }
+    const feedInfo = await this.FeedModel.findOne({
       where: {
         memberId,
         id: feedId,
       },
     });
-    if (feedInfo === null) {
-      throw new Error();
+    // like 테이블에 create
+    const likeResult = await likeInfo.destroy({ memberId, feedId });
+    if (likeResult === null) {
+      throw new Error("알 수 없는 오류가 발생하였습니다.");
     }
-    // 좋아요가 없는지 검사
-    const { memberId } = feedInfo;
-    if (({ memberId } = null)) {
-      throw new Error();
-    }
-    // like 테이블에 destroy
-    const likeResult = await this.LikeModel.destroy({ memberId, feedId });
-    if (likeResult !== null) {
-      throw new Error();
-    }
-    //Feed 테이블에 likeNum 에 -1 업데이트
-    await feedInfo.increment("LikeNum", { by: -1 });
+    //Feed 테이블에 likeNum 에 +1 업데이트
+    await feedInfo.decrement("LikeNum", { by: 1 });
 
     return true;
   }
@@ -78,7 +80,7 @@ export default class FeedService {
       ],
     });
     if (feedInfo === null) {
-      throw new Error();
+      throw new Error("알 수 없는 오류가 발생하였습니다.");
     }
     return feedInfo;
   }
@@ -110,7 +112,7 @@ export default class FeedService {
       ],
     });
     if (feedInfo === null) {
-      throw new Error();
+      throw new Error("알 수 없는 오류가 발생하였습니다.");
     }
     return feedInfo;
   }
