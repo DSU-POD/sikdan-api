@@ -17,6 +17,7 @@ router.post("/like", async (req, res, next) => {
       message: "좋아요가 추가되었습니다.",
     });
   } catch (e) {
+    console.log(e);
     next(e);
   }
 });
@@ -35,7 +36,7 @@ router.delete("/likeCancel", async (req, res, next) => {
     const likeCancel = await feedService.likeCancel(memberId, feedId);
     next({
       data: likeCancel,
-      message: "좋아요가 추가되었습니다.",
+      message: "좋아요가 삭제되었습니다.",
     });
   } catch (e) {
     next(e);
