@@ -1,5 +1,6 @@
 import express from "express";
 import { MemberService } from "../services/member/member.service.js";
+import JwtStrateGy from "../auth/jwt.strategy.js";
 const router = express.Router();
 const memberService = new MemberService();
 
@@ -57,6 +58,35 @@ router.post("/register/complete", async (req, res, next) => {
     next({
       data: "",
       message: "회원가입 되었습니다.",
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get("/info", async (req, res, next) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = JwtStrateGy.validateJwt(token);
+    const userId = decoded.userId;
+    await memberService.information(userId);
+    next({
+      data: "",
+      message: "회원 정보를 불러옵니다.",
+    });
+  } catch (e) {
+    console.log(e);
+    next(e);
+  }
+});
+
+router.patch("/edit", async (req, res, next) => {
+  try {
+    const { userInfo } = req.body;
+    await memberService.editeInfo(userInfo);
+    next({
+      data: "",
+      message: "회원 정보를 수정합니다.",
     });
   } catch (e) {
     next(e);
