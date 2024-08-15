@@ -69,10 +69,11 @@ router.get("/info", async (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
     const decoded = JwtStrateGy.validateJwt(token);
     const userId = decoded.userId;
-    await memberService.information(userId);
+    const memberInfo = await memberService.information(userId);
+
     next({
-      data: "",
-      message: "회원 정보를 불러옵니다.",
+      data: memberInfo,
+      message: "회원 정보를 불러왔습니다.",
     });
   } catch (e) {
     console.log(e);
@@ -82,10 +83,13 @@ router.get("/info", async (req, res, next) => {
 
 router.patch("/edit", async (req, res, next) => {
   try {
-    const { userInfo } = req.body;
-    await memberService.editeInfo(userInfo);
+    const { editData } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const { userId } = await JwtStrateGy.validateJwt(token);
+
+    const memberInfo = await memberService.editInfo(userId, editData);
     next({
-      data: "",
+      data: memberInfo,
       message: "회원 정보를 수정합니다.",
     });
   } catch (e) {
@@ -93,4 +97,19 @@ router.patch("/edit", async (req, res, next) => {
   }
 });
 
+router.patch("/editPassword", async (req, res, next) => {
+  try {
+    const { newPassword } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const { userId } = await JwtStrateGy.validateJwt(token);
+
+    const memberInfo = await memberService.editPassword(userId, newPassword);
+    next({
+      data: memberInfo,
+      message: "회원 정보를 수정합니다.",
+    });
+  } catch (e) {
+    next(e);
+  }
+});
 export default router;
