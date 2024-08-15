@@ -93,7 +93,7 @@ export class MemberService {
       const { encryptPassword, salt } = encryptPassword(randomPassword, salt);
       await this.MemberModel.update(
         {
-          encryptPassword: password,
+          password: encryptPassword,
           salt,
         },
         {
@@ -193,25 +193,53 @@ export class MemberService {
     const idInfo = await this.MemberModel.findOne({
       userId,
     });
-    if (userId !== idInfo) {
+    if (idInfo === null) {
       throw new Error("알 수 없는 오류가 발생하였습니다.");
     }
 
     return idInfo;
   }
 
-  async editeInfo(userInfo) {
-    const { password, email, age, height, weight, goal } = userInfo;
-    const result = await this.MemberModel.findOne({
-      password,
-      email,
-      age,
+  async editInfo(userId, editData) {
+    const { height, weight, goal } = editData || {};
+    const findInfo = await this.MemberModel.findOne({
+      where: {
+        userId,
+      },
+    });
+
+    const result = await findInfo.update({
       height,
       weight,
       goal,
     });
     if (!result) {
-      throw new Error("회원 정보 불러오는데 실패하였습니다.");
+      throw new Error("회원 정보를 업데이트에 실패하였습니다.");
     }
+
+    return true;
+  }
+
+  async editPassword(userId, newPassword) {
+    const findInfo = await this.MemberModel.findOne({
+      where: {
+        userId,
+      },
+    });
+    if (findInfo.password !== newPassword) {
+      //새로운 패스워드, 암호화 하고 저장
+
+      const { encryptPassword, salt } = this.encryptPassword(newPassword, findInfo.salt);
+
+      const result = await findInfo.update({
+        password: encryptPassword,
+        salt,
+      });
+      if (!result) {
+        throw new Error("회원 정보를 업데이트에 실패하였습니다.");
+      }
+    }
+
+    return true;
   }
 }
