@@ -18,24 +18,23 @@ const FeedModel = (sequelize, DataTypes) => {
         type: DataTypes.CHAR,
         allowNull: false,
       },
-      subject: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
       contents: {
         type: DataTypes.STRING,
         allowNull: false,
       },
       ai_feedback: {
         type: DataTypes.TEXT,
+        defaultValue: "",
         allowNull: false,
       },
       likeNum: {
         type: DataTypes.INTEGER,
+        defaultValue: 0,
         allowNull: false,
       },
       commentNum: {
         type: DataTypes.INTEGER,
+        defaultValue: 0,
         allowNull: false,
       },
       // 기타 필드
@@ -58,6 +57,11 @@ const FeedModel = (sequelize, DataTypes) => {
       foreignKey: "feedId",
       sourceKey: "id",
       as: "feedLike",
+    });
+    Feed.belongsTo(models.DietModel, {
+      foreignKey: "dietId",
+      sourceKey: "id",
+      as: "feedDiet",
     });
   };
 
