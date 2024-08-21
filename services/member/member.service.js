@@ -201,12 +201,20 @@ export class MemberService {
   }
 
   async editInfo(userId, editData) {
-    const { height, weight, goal } = editData || {};
+    const { height, weight, goal, allergy } = editData || {};
     const findInfo = await this.MemberModel.findOne({
       where: {
         userId,
       },
     });
+
+    // 알러지 업데이트
+    if (allergy !== null && allergy.length > 0) {
+      const allergyData = JSON.stringify(allergy);
+      await findInfo.update({
+        allergyData,
+      });
+    }
 
     const result = await findInfo.update({
       height,
@@ -226,11 +234,10 @@ export class MemberService {
         userId,
       },
     });
+
+    //새로운 패스워드, 암호화 하고 저장
     if (findInfo.password !== newPassword) {
-      //새로운 패스워드, 암호화 하고 저장
-
       const { encryptPassword, salt } = this.encryptPassword(newPassword, findInfo.salt);
-
       const result = await findInfo.update({
         password: encryptPassword,
         salt,
