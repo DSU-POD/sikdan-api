@@ -1,8 +1,8 @@
 import { UUIDV4 } from "sequelize";
 
-const FoodListModel = (sequelize, DataTypes) => {
+const FoodModel = (sequelize, DataTypes) => {
   const FoodList = sequelize.define(
-    "FoodListModel",
+    "FoodModel",
     {
       id: {
         type: DataTypes.CHAR,
@@ -47,11 +47,11 @@ const FoodListModel = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "FoodListModel",
-      tableName: "FoodList",
+      modelName: "FoodModel",
+      tableName: "Food",
       timestamp: true,
     }
   );
   return FoodList;
 };
-export default FoodListModel;
+export default FoodModel;
