@@ -6,7 +6,7 @@ const CommentModel = (sequelize, DataTypes) => {
     {
       id: {
         type: DataTypes.CHAR,
-        defaultValue: UUIDV4,
+        defaultValue: UUIDV4(),
         primaryKey: true,
       },
       memberId: {

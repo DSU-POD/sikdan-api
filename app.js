@@ -40,7 +40,7 @@ app.use(async (req, res, next) => {
         throw new Error("비정상적인 접근입니다.");
       }
       const token = req.headers.authorization.split(" ")[1];
-      JwtStrateGy.validateJwt(token);
+      const result = JwtStrateGy.validateJwt(token);
     }
   } catch (e) {
     next(e);

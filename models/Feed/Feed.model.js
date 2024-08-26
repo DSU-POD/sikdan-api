@@ -63,6 +63,11 @@ const FeedModel = (sequelize, DataTypes) => {
       sourceKey: "id",
       as: "feedDiet",
     });
+    Feed.hasMany(models.CommentModel, {
+      foreignKey: "feedId",
+      sourceKey: "id",
+      as: "feedComment",
+    });
   };
 
   return Feed;

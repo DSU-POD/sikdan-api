@@ -1,8 +1,58 @@
 import express from "express";
 import FeedService from "../services/feed/feed.service.js";
+import multer from "multer";
+import path from "path";
+import JwtStrateGy from "../auth/jwt.strategy.js";
 const router = express.Router();
 const feedService = new FeedService();
 
+const storage = multer.memoryStorage();
+
+const upload = multer({ storage: storage });
+
+router.post("/write", async (req, res, next) => {
+  try {
+    const { predict, writeData } = req.body;
+    if (!predict || !writeData) {
+      throw new Error("올바르지 못한 접근입니다.");
+    }
+
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = await JwtStrateGy.validateJwt(token);
+
+    writeData.memberId = decoded.memberId;
+    const result = await feedService.write(predict, writeData);
+    next({
+      message: "정상적으로 피드가 작성되었습니다.",
+      data: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+router.post("/predict", upload.single("file"), async (req, res, next) => {
+  try {
+    const blobName = Date.now() + path.extname(req.file.originalname);
+    const url = await FeedService.uploadToAzure(
+      req.file.buffer,
+      blobName,
+      req.file.mimetype
+    );
+
+    const predict = await feedService.predict(url);
+    console.log(predict);
+    next({
+      message: "정상적으로 업로드 되었습니다.",
+      data: {
+        predict,
+        url,
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    next(e);
+  }
+});
 router.post("/like", async (req, res, next) => {
   try {
     const { memberId } = req.body;
@@ -62,7 +112,10 @@ router.get("/list/:page", async (req, res, next) => {
 router.get("/view/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const feed = await feedService.getFeed(id);
+    const token = req.headers.authorization.split(" ")[1];
+    const { memberId } = await JwtStrateGy.validateJwt(token);
+
+    const feed = await feedService.getFeed(id, memberId);
     next({
       data: feed,
       message: "조회 되었습니다.",
