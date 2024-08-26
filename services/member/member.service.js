@@ -58,11 +58,7 @@ export class MemberService {
       },
     });
     const { userId } = findInfo;
-    this.sendMail(
-      email,
-      "[MealMate] 아이디 보내드립니다.",
-      `아이디 : ${userId}`
-    );
+    this.sendMail(email, "[MealMate] 아이디 보내드립니다.", `아이디 : ${userId}`);
 
     if (findInfo === null) {
       throw new Error("회원 정보가 없습니다.");
@@ -98,7 +94,7 @@ export class MemberService {
       const { encryptPassword, salt } = encryptPassword(randomPassword, salt);
       await this.MemberModel.update(
         {
-          encryptPassword: password,
+          password: encryptPassword,
           salt,
         },
         {
@@ -109,28 +105,13 @@ export class MemberService {
         }
       );
 
-      this.sendMail(
-        email,
-        "[MealMate] 임시 비밀번호 보내드립니다.",
-        `임시 비밀번호 : ${randomPassword}`
-      );
+      this.sendMail(email, "[MealMate] 임시 비밀번호 보내드립니다.", `임시 비밀번호 : ${randomPassword}`);
     }
     return true;
   }
 
   async register(registerData) {
-    const {
-      userId,
-      password,
-      email,
-      nickname,
-      gender,
-      age,
-      height,
-      weight,
-      goal,
-      trainer_yn,
-    } = registerData;
+    const { userId, password, email, nickname, gender, age, height, weight, goal, trainer_yn } = registerData;
 
     const checkId = await this.MemberModel.findOne({
       //id 중복 체크
@@ -207,5 +188,66 @@ export class MemberService {
 
       return true;
     });
+  }
+
+  async information(userId) {
+    const idInfo = await this.MemberModel.findOne({
+      userId,
+    });
+    if (idInfo === null) {
+      throw new Error("알 수 없는 오류가 발생하였습니다.");
+    }
+
+    return idInfo;
+  }
+
+  async editInfo(userId, editData) {
+    const { height, weight, goal, allergy } = editData || {};
+    const findInfo = await this.MemberModel.findOne({
+      where: {
+        userId,
+      },
+    });
+
+    // 알러지 업데이트
+    if (allergy !== null && allergy.length > 0) {
+      const allergyData = JSON.stringify(allergy);
+      await findInfo.update({
+        allergyData,
+      });
+    }
+
+    const result = await findInfo.update({
+      height,
+      weight,
+      goal,
+    });
+    if (!result) {
+      throw new Error("회원 정보를 업데이트에 실패하였습니다.");
+    }
+
+    return true;
+  }
+
+  async editPassword(userId, newPassword) {
+    const findInfo = await this.MemberModel.findOne({
+      where: {
+        userId,
+      },
+    });
+
+    //새로운 패스워드, 암호화 하고 저장
+    if (findInfo.password !== newPassword) {
+      const { encryptPassword, salt } = this.encryptPassword(newPassword, findInfo.salt);
+      const result = await findInfo.update({
+        password: encryptPassword,
+        salt,
+      });
+      if (!result) {
+        throw new Error("회원 정보를 업데이트에 실패하였습니다.");
+      }
+    }
+
+    return true;
   }
 }
