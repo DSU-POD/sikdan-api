@@ -166,7 +166,6 @@ export default class FeedService {
       },
       attributes: [
         "id",
-        "subject",
         "contents",
         "ai_feedback",
         "likeNum",
