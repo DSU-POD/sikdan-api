@@ -5,9 +5,12 @@ const feedService = new FeedService();
 
 router.post("/like", async (req, res, next) => {
   try {
-    const { memberId } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = JwtStrateGy.validateJwt(token);
+    const memberId = decoded.userId;
+
     const { feedId } = req.body;
-    if (!req.body.memberId || !req.body.feedId) {
+    if (!memberId || !req.body.feedId) {
       // 회원 또는 피드 없으면 퇴각
       throw new Error("비정상적인 접근입니다.");
     }
@@ -24,9 +27,12 @@ router.post("/like", async (req, res, next) => {
 
 router.delete("/likeCancel", async (req, res, next) => {
   try {
-    const { memberId } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = JwtStrateGy.validateJwt(token);
+    const memberId = decoded.userId;
+
     const { feedId } = req.body;
-    if (!req.body.memberId || !req.body.feedId) {
+    if (!memberId || !req.body.feedId) {
       // 회원 또는 피드 없으면 퇴각
       throw new Error("비정상적인 접근입니다.");
     } else if (req.body.memberId === null) {
