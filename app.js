@@ -36,7 +36,10 @@ app.use(async (req, res, next) => {
       "/member/register/complete",
     ];
     if (!exceptPath.includes(req.path)) {
-      if (req.headers.authrozation === "") {
+      if (
+        req.headers.authrozation === "" ||
+        typeof req.headers.authrozation !== "string"
+      ) {
         throw new Error("비정상적인 접근입니다.");
       }
       const token = req.headers.authorization.split(" ")[1];
