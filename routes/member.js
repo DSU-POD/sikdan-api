@@ -64,6 +64,54 @@ router.post("/register/complete", async (req, res, next) => {
   }
 });
 
+router.post("/register/id_duplicate", async (req, res, next) => {
+  try {
+    const { type, value } = req.body;
+    if (!value) {
+      throw new Error("아이디를 입력해주세요.");
+    }
+    await memberService.duplicate(type, value);
+    next({
+      data: "",
+      message: "사용 가능한 아이디 입니다",
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.post("/register/nickname_duplicate", async (req, res, next) => {
+  try {
+    const { type, value } = req.body;
+    if (!value) {
+      throw new Error("닉네임을 입력해주세요.");
+    }
+    await memberService.duplicate(type, value);
+    next({
+      data: "",
+      message: "사용 가능한 닉네임 입니다",
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.post("/register/email_duplicate", async (req, res, next) => {
+  try {
+    const { type, value } = req.body;
+    if (!value) {
+      throw new Error("이메일을 입력해주세요.");
+    }
+    await memberService.duplicate(type, value);
+    next({
+      data: "",
+      message: "사용 가능한 이메일 입니다",
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.get("/info", async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -76,7 +124,6 @@ router.get("/info", async (req, res, next) => {
       message: "회원 정보를 불러왔습니다.",
     });
   } catch (e) {
-    console.log(e);
     next(e);
   }
 });
