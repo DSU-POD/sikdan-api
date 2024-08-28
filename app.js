@@ -37,8 +37,8 @@ app.use(async (req, res, next) => {
     ];
     if (!exceptPath.includes(req.path)) {
       if (
-        req.headers.authrozation === "" ||
-        typeof req.headers.authrozation !== "string"
+        req.headers.authorization === "" ||
+        typeof req.headers.authorization !== "string"
       ) {
         throw new Error("비정상적인 접근입니다.");
       }
