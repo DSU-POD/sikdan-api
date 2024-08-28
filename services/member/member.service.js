@@ -164,6 +164,19 @@ export class MemberService {
     return true;
   }
 
+  async duplicate(type, value) {
+    const dulicateCheck = await this.MemberModel.findOne({
+      //id, nickname, email 중복 체크
+      [type]: value || "",
+    });
+
+    if (dulicateCheck !== null) {
+      throw new Error("이미 가입된 " + $[type] + "입니다.");
+    } else {
+      return true;
+    }
+  }
+
   sendMail(to, subject, text) {
     const transporter = nodemailer.createTransport({
       service: process.env.MAIL_TYPE,
