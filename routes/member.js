@@ -64,50 +64,19 @@ router.post("/register/complete", async (req, res, next) => {
   }
 });
 
-router.post("/register/id_duplicate", async (req, res, next) => {
+router.post("/register/duplicate", async (req, res, next) => {
   try {
-    const { type, value } = req.body;
-    if (!value) {
-      throw new Error("아이디를 입력해주세요.");
+    const { type, data } = req.body;
+    if (!data) {
+      throw new Error(`${type} 을/를 입력해주세요.`);
     }
-    await memberService.duplicate(type, value);
+    await memberService.duplicate(type, data);
     next({
       data: "",
-      message: "사용 가능한 아이디 입니다",
+      message: `사용 가능한 ${type} 입니다.`,
     });
   } catch (e) {
-    next(e);
-  }
-});
-
-router.post("/register/nickname_duplicate", async (req, res, next) => {
-  try {
-    const { type, value } = req.body;
-    if (!value) {
-      throw new Error("닉네임을 입력해주세요.");
-    }
-    await memberService.duplicate(type, value);
-    next({
-      data: "",
-      message: "사용 가능한 닉네임 입니다",
-    });
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.post("/register/email_duplicate", async (req, res, next) => {
-  try {
-    const { type, value } = req.body;
-    if (!value) {
-      throw new Error("이메일을 입력해주세요.");
-    }
-    await memberService.duplicate(type, value);
-    next({
-      data: "",
-      message: "사용 가능한 이메일 입니다",
-    });
-  } catch (e) {
+    console.log(e);
     next(e);
   }
 });
