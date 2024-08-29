@@ -20,7 +20,6 @@ router.post("/like", async (req, res, next) => {
       message: "좋아요가 추가되었습니다.",
     });
   } catch (e) {
-    console.log(e);
     next(e);
   }
 });
