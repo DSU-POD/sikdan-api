@@ -64,6 +64,23 @@ router.post("/register/complete", async (req, res, next) => {
   }
 });
 
+router.post("/register/duplicate", async (req, res, next) => {
+  try {
+    const { type, data } = req.body;
+    if (!data) {
+      throw new Error(`${type} 을/를 입력해주세요.`);
+    }
+    await memberService.duplicate(type, data);
+    next({
+      data: "",
+      message: `사용 가능한 ${type} 입니다.`,
+    });
+  } catch (e) {
+    console.log(e);
+    next(e);
+  }
+});
+
 router.get("/info", async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -76,7 +93,6 @@ router.get("/info", async (req, res, next) => {
       message: "회원 정보를 불러왔습니다.",
     });
   } catch (e) {
-    console.log(e);
     next(e);
   }
 });
