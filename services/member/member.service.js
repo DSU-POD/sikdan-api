@@ -164,19 +164,6 @@ export class MemberService {
     return true;
   }
 
-  async duplicate(type, data) {
-    const dulicateCheck = await this.MemberModel.findOne({
-      //id, nickname, email 중복 체크
-      where: { [type]: data },
-    });
-
-    if (dulicateCheck !== null) {
-      throw new Error(`이미 가입된 ${type} 입니다.`);
-    } else {
-      return true;
-    }
-  }
-
   sendMail(to, subject, text) {
     const transporter = nodemailer.createTransport({
       service: process.env.MAIL_TYPE,
@@ -200,6 +187,19 @@ export class MemberService {
 
       return true;
     });
+  }
+
+  async duplicate(type, data) {
+    const dulicateCheck = await this.MemberModel.findOne({
+      //id, nickname, email 중복 체크
+      where: { [type]: data },
+    });
+
+    if (dulicateCheck !== null) {
+      throw new Error(`이미 가입된 ${type} 입니다.`);
+    } else {
+      return true;
+    }
   }
 
   async information(userId) {
