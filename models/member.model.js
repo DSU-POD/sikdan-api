@@ -68,6 +68,11 @@ const MemberModel = (sequelize, DataTypes) => {
       sourceKey: "id",
       as: "memberFeed",
     });
+    Member.hasMany(models.CommentModel, {
+      foreignKey: "memberId",
+      sourceKey: "id",
+      as: "memberComment",
+    });
   };
   return Member;
 };

@@ -8,17 +8,34 @@ const DietModel = (sequelize, DataTypes) => {
         defaultValue: UUIDV4(),
         primaryKey: true,
       },
-      postId: {
+      feedId: {
         type: DataTypes.CHAR,
         defaultValue: UUIDV4(),
         allowNull: false,
       },
-      memberId: {
+      dietName: {
         type: DataTypes.STRING,
+        defaultValue: "",
         allowNull: false,
       },
-      predictData: {
+      foods: {
         type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      nutrient: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      foods: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      total_calories: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      url: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
     },
