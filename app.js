@@ -34,6 +34,7 @@ app.use(async (req, res, next) => {
       "/member/find_id",
       "/member/find_password",
       "/member/register/complete",
+      "/member/register/duplicate",
     ];
     if (!exceptPath.includes(req.path)) {
       if (
