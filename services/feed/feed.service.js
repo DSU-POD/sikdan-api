@@ -19,13 +19,14 @@ export default class FeedService {
 
     try {
       const { total_calories, foods, nutrient, url } = predict;
-      const { contents, dietName, memberId } = writeData;
+      const { contents, dietName, memberId, meals } = writeData;
       const dietResult = await this.DietModel.create({
         total_calories,
         foods: JSON.stringify(foods),
         nutrient: JSON.stringify(nutrient),
         url,
         dietName,
+        meals,
       });
 
       const feedResult = await this.FeedModel.create({
@@ -143,6 +144,7 @@ export default class FeedService {
           attributes: ["userId", "nickname"],
         },
       ],
+      order: [["feedComment", "createdAt", "DESC"]], // 최상위에 위치한 order
     });
     if (feedInfo === null) {
       throw new Error("피드 정보를 찾을수 없습니다.");
