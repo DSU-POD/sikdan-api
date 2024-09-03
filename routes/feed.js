@@ -56,11 +56,10 @@ router.post("/predict", upload.single("file"), async (req, res, next) => {
 router.post("/like", async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
-    const decoded = JwtStrateGy.validateJwt(token);
-    const memberId = decoded.userId;
-
+    const decoded = await JwtStrateGy.validateJwt(token);
+    const memberId = decoded.memberId;
     const { feedId } = req.body;
-    if (!memberId || !req.body.feedId) {
+    if (!memberId || !feedId) {
       // 회원 또는 피드 없으면 퇴각
       throw new Error("비정상적인 접근입니다.");
     }
