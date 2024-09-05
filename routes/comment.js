@@ -1,19 +1,28 @@
 import express from "express";
 import CommentService from "../services/feed/comment.service.js";
+import JwtStrateGy from "../auth/jwt.strategy.js";
 const router = express.Router();
 const commentService = new CommentService();
 
 router.post("/add", async (req, res, next) => {
   try {
-    const { memberId, feedId, contents } = req.body;
+    const { feedId, contents } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const { memberId } = await JwtStrateGy.validateJwt(token);
+
     if (!memberId || !feedId || !contents) {
       throw new Error("비정상적인 접근입니다.");
     }
 
-    await commentService.create({
+    const result = await commentService.create({
       memberId,
       feedId,
       contents,
+    });
+
+    next({
+      data: result,
+      message: "댓글이 작성 되었습니다.",
     });
   } catch (e) {
     next(e);
@@ -63,4 +72,21 @@ router.delete("/delete/:id", async (req, res, next) => {
   }
 });
 
+router.get("/:feedId", async (req, res, next) => {
+  try {
+    if (!req.params.feedId) {
+      throw new Error("비정상적인 접근입니다.");
+    }
+
+    const { feedId } = req.params;
+
+    const result = await commentService.getAll(feedId);
+    next({
+      data: result,
+      message: "정상적으로 조회되었습니다.",
+    });
+  } catch (e) {
+    next(e);
+  }
+});
 export default router;

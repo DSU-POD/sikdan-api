@@ -38,6 +38,10 @@ const DietModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      meals: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
     {
       sequelize,

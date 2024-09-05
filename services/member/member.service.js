@@ -61,7 +61,7 @@ export class MemberService {
     this.sendMail(email, "[MealMate] 아이디 보내드립니다.", `아이디 : ${userId}`);
 
     if (findInfo === null) {
-      throw new Error("회원 정보가 없습니다.");
+      throw new Error("가입된 회원 정보가 없습니다.");
     }
     return findInfo.userId;
   }
@@ -75,7 +75,7 @@ export class MemberService {
       },
     });
     if (findInfo === null) {
-      throw new Error("회원 정보가 없습니다.");
+      throw new Error("가입된 회원 정보가 없습니다.");
     }
     return findInfo;
   }
@@ -163,6 +163,19 @@ export class MemberService {
       throw new Error("회원가입에 실패하였습니다.");
     }
     return true;
+  }
+
+  async duplicate(type, data) {
+    const dulicateCheck = await this.MemberModel.findOne({
+      //id, nickname, email 중복 체크
+      where: { [type]: data },
+    });
+
+    if (dulicateCheck !== null) {
+      throw new Error(`이미 가입된 ${type} 입니다.`);
+    } else {
+      return true;
+    }
   }
 
   sendMail(to, subject, text) {

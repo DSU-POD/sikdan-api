@@ -4,8 +4,34 @@ export default class CommentService {
   constructor() {
     this.FeedModel = db.FeedModel;
     this.CommentModel = db.CommentModel;
+    this.MemberModel = db.MemberModel;
   }
 
+  async getAll(feedId) {
+    const feedInfo = await this.FeedModel.findOne({
+      where: {
+        id: feedId,
+      },
+    });
+
+    if (feedInfo === null) {
+      throw new Error("게시글이 존재하지 않습니다.");
+    }
+    //댓글 불러오는거 include.model.getTableName is not a function 오류 고치기
+    const commentList = await this.CommentModel.findAll({
+      where: {
+        feedId,
+      },
+      order: [["createdAt", "DESC"]],
+      include: {
+        model: this.MemberModel,
+        as: "memberComment",
+        attributes: ["userId", "nickname"],
+      },
+    });
+
+    return commentList;
+  }
   async create({ memberId, feedId, contents }) {
     const feedInfo = await this.FeedModel.findOne({
       where: {
