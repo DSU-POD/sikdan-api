@@ -166,7 +166,14 @@ export default class FeedService {
       where: {
         type,
       },
-      attributes: ["id", "contents", "ai_feedback", "likeNum", "commentNum"],
+      attributes: [
+        "id",
+        "contents",
+        "ai_feedback",
+        "likeNum",
+        "commentNum",
+        "type",
+      ],
       include: [
         {
           model: this.LikeModel,
