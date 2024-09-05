@@ -37,6 +37,11 @@ const FeedModel = (sequelize, DataTypes) => {
         defaultValue: 0,
         allowNull: false,
       },
+      type: {
+        type: DataTypes.STRING,
+        defaultValue: "expert",
+        allowNull: false,
+      },
       // 기타 필드
     },
     {
