@@ -173,6 +173,7 @@ export default class FeedService {
         "likeNum",
         "commentNum",
         "type",
+        "createdAt",
       ],
       include: [
         {
