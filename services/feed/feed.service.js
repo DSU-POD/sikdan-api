@@ -159,20 +159,14 @@ export default class FeedService {
     if (page > 1) {
       offset = 10 * (page - 1);
     }
-    // 피드 아이디가 있는지 확인
-    const feedInfo = await this.FeedModel.findAll({
+
+    const tmpFeedList = await this.FeedModel.findAll({
       limit: 10,
       offset,
       where: {
         type,
       },
-      attributes: [
-        "id",
-        "contents",
-        "ai_feedback",
-        "likeNum",
-        "commentNum",
-      ],
+      attributes: ["id", "contents", "ai_feedback", "likeNum", "commentNum"],
       include: [
         {
           model: this.LikeModel,
@@ -191,10 +185,16 @@ export default class FeedService {
         },
       ],
     });
-    if (feedInfo === null) {
+
+    if (tmpFeedList === null) {
       throw new Error("알 수 없는 오류가 발생하였습니다.");
     }
-    return feedInfo;
+
+    const feedList = tmpFeedList.map((feed) => ({
+      ...feed.toJSON(),
+      isLike: feed.feedLike.length > 0 ? true : false,
+    }));
+    return feedList;
   }
 
   async deleteFeed(id) {
