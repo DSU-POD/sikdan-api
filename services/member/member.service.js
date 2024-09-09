@@ -237,7 +237,7 @@ export class MemberService {
 
   async information(userId) {
     const idInfo = await this.MemberModel.findOne({
-      attributes: ["age", "height", "weight", "goal"],
+      attributes: ["age", "height", "weight", "goal", "allergy"],
       where: {
         userId,
       },
