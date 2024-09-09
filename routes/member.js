@@ -84,7 +84,7 @@ router.post("/register/duplicate", async (req, res, next) => {
 router.get("/info", async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
-    const decoded = JwtStrateGy.validateJwt(token);
+    const decoded = await JwtStrateGy.validateJwt(token);
     const userId = decoded.userId;
     const memberInfo = await memberService.information(userId);
 
