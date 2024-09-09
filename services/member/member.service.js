@@ -203,9 +203,25 @@ export class MemberService {
     });
   }
 
+  async duplicate(type, data) {
+    const dulicateCheck = await this.MemberModel.findOne({
+      //id, nickname, email 중복 체크
+      where: { [type]: data },
+    });
+
+    if (dulicateCheck !== null) {
+      throw new Error(`이미 가입된 ${type} 입니다.`);
+    } else {
+      return true;
+    }
+  }
+
   async information(userId) {
     const idInfo = await this.MemberModel.findOne({
-      userId,
+      attributes: ["age", "height", "weight", "goals"],
+      where: {
+        userId,
+      },
     });
     if (idInfo === null) {
       throw new Error("알 수 없는 오류가 발생하였습니다.");
@@ -222,18 +238,11 @@ export class MemberService {
       },
     });
 
-    // 알러지 업데이트
-    if (allergy !== null && allergy.length > 0) {
-      const allergyData = JSON.stringify(allergy);
-      await findInfo.update({
-        allergyData,
-      });
-    }
-
     const result = await findInfo.update({
       height,
       weight,
       goal,
+      allergy,
     });
     if (!result) {
       throw new Error("회원 정보를 업데이트에 실패하였습니다.");

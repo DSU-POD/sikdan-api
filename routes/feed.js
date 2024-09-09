@@ -80,7 +80,7 @@ router.delete("/likeCancel", async (req, res, next) => {
     const memberId = decoded.memberId;
 
     const { feedId } = req.body;
-    if (!memberId || !feedId) {
+    if (!memberId || !feedId)
       throw new Error("비정상적인 접근입니다.");
     }
     const likeCancel = await feedService.likeCancel(memberId, feedId);

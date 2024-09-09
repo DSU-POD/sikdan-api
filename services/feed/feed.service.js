@@ -35,6 +35,26 @@ export default class FeedService {
         memberId,
       });
 
+      const memberInfo = await this.MemberModel.findOne({
+        where: {
+          memberId,
+        },
+      });
+
+      const { age, goal } = memberInfo;
+
+      const feedbackContents = await this.feedback(age, goal, foods.join(","), meals);
+      await this.FeedModel.update(
+        {
+          ai_feedback: feedbackContents,
+        },
+        {
+          where: {
+            id: feedResult.id,
+          },
+        }
+      );
+
       await transaction.commit();
 
       return feedResult.id;
@@ -46,6 +66,7 @@ export default class FeedService {
   }
 
   async updateFeedback(aiFeedBack) {}
+
   async like(memberId, feedId) {
     const likeInfo = await this.LikeModel.findOne({
       where: {
@@ -120,13 +141,7 @@ export default class FeedService {
         {
           model: this.DietModel,
           as: "feedDiet",
-          attributes: [
-            "foods",
-            "nutrient",
-            "total_calories",
-            "url",
-            "dietName",
-          ],
+          attributes: ["foods", "nutrient", "total_calories", "url", "dietName"],
         },
         {
           model: this.CommentModel,
@@ -166,6 +181,7 @@ export default class FeedService {
       where: {
         type,
       },
+
       attributes: [
         "id",
         "contents",
@@ -234,17 +250,32 @@ export default class FeedService {
       }`;
     }
   }
+  async feedback(url) {
+    const __dirname = path.resolve();
+    const scriptPath = path.join(__dirname, "predict.py");
+    const predict = await new Promise((resolve, reject, err) =>
+      exec(`python3 ${scriptPath} ${url}`, (err, stdout, stderr) => {
+        if (err || stderr) {
+          reject("예측에 실패하였습니다.");
+        }
+        resolve(stdout.trim());
+      })
+    );
+    try {
+      return JSON.parse(predict);
+    } catch {
+      return `{
+        foods: [],
+      }`;
+    }
+  }
 
   static async uploadToAzure(fileBuffer, blobName, mimeType) {
     // blob stroage client
-    const blobServiceClient = BlobServiceClient.fromConnectionString(
-      process.env.AZURE_CONNECTION
-    );
+    const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_CONNECTION);
 
     // blob storage의 컨테이너 client
-    const containerClient = blobServiceClient.getContainerClient(
-      process.env.AZURE_CONTAINER_NAME
-    );
+    const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_CONTAINER_NAME);
 
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.upload(fileBuffer, fileBuffer.length, {
