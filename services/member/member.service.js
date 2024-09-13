@@ -40,11 +40,12 @@ export class MemberService {
     if (memberInfo === null) {
       throw new Error("아이디 혹은 비밀번호를 확인해주세요."); //아이디 존재, 비밀번호 불일치
     } else {
-      const { id, userId, email } = memberInfo;
+      const { id, userId, email, trainer_yn } = memberInfo;
       const token = JwtStrateGy.createJwtToken({
         memberId: id,
         userId,
         email,
+        trainer_yn,
       });
       return token; //아이디, 비밀번호 일치
     }

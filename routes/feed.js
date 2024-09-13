@@ -95,11 +95,9 @@ router.delete("/likeCancel", async (req, res, next) => {
 
 router.get("/list/:page", async (req, res, next) => {
   try {
-    const { page } = req.params;
-    const { type } = req.query;
-    if (!page || (type !== "expert" && type !== "people")) {
-      throw new Error("비정상적인 접근입니다.");
-    }
+    const page = req.params.page ?? 1;
+    const type = req.query.type ?? "expert";
+
     const feedList = await feedService.getFeedList(page, type);
     next({
       data: feedList,

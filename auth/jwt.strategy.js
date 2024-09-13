@@ -5,12 +5,13 @@ dotenv.config();
 class JwtStrateGy {
   constructor() {}
 
-  static createJwtToken({ memberId, userId, email }) {
+  static createJwtToken({ memberId, userId, email, trainer_yn }) {
     return jwt.sign(
       {
         memberId,
         userId,
         email,
+        trainer_yn,
       },
       process.env.JWT_SECRET_KEY,
       {
