@@ -33,11 +33,7 @@ router.post("/write", async (req, res, next) => {
 router.post("/predict", upload.single("file"), async (req, res, next) => {
   try {
     const blobName = Date.now() + path.extname(req.file.originalname);
-    const url = await FeedService.uploadToAzure(
-      req.file.buffer,
-      blobName,
-      req.file.mimetype
-    );
+    const url = await FeedService.uploadToAzure(req.file.buffer, blobName, req.file.mimetype);
 
     const predict = await feedService.predict(url);
     console.log(predict);
@@ -122,7 +118,24 @@ router.get("/view/:id", async (req, res, next) => {
     next(e);
   }
 });
-router.patch("/edit/:id", async (req, res, next) => {});
+
+router.patch("/edit/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { editData } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const { memberId } = await JwtStrateGy.validateJwt(token);
+
+    const edit = await feedService.editFeed(id, editData, memberId);
+    next({
+      data: edit,
+      message: "피드를 수정합니다.",
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.delete("/delete/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
