@@ -162,7 +162,7 @@ export default class FeedService {
       order: [["feedComment", "createdAt", "DESC"]], // 최상위에 위치한 order
     });
     if (feedInfo === null) {
-      throw new Error("피드 정보를 찾을수 없습니다.");
+      throw new Error("피드 정보를 찾을 수 없습니다.");
     }
 
     feedInfo.feedDiet.nutrient = JSON.parse(feedInfo.feedDiet.nutrient);
@@ -232,12 +232,14 @@ export default class FeedService {
     const findInfo = await this.FeedModel.findOne({
       where: {
         id,
+        memberId,
+        feedId,
       },
       attributes: ["contents", "memberId"],
       include: [
         {
           model: this.DietModel,
-          as: "feedid",
+          as: "feedId",
           attributes: ["dietName"],
         },
       ],
