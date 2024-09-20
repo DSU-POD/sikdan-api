@@ -43,12 +43,7 @@ export default class FeedService {
 
       const { age, goal } = memberInfo;
 
-      const feedbackContents = await this.feedback(
-        age,
-        goal,
-        foods.join(","),
-        meals
-      );
+      const feedbackContents = await this.feedback(age, goal, foods.join(","), meals);
       await this.FeedModel.update(
         {
           ai_feedback: feedbackContents,
@@ -146,13 +141,7 @@ export default class FeedService {
         {
           model: this.DietModel,
           as: "feedDiet",
-          attributes: [
-            "foods",
-            "nutrient",
-            "total_calories",
-            "url",
-            "dietName",
-          ],
+          attributes: ["foods", "nutrient", "total_calories", "url", "dietName"],
         },
         {
           model: this.CommentModel,
@@ -193,15 +182,7 @@ export default class FeedService {
         type,
       },
 
-      attributes: [
-        "id",
-        "contents",
-        "ai_feedback",
-        "likeNum",
-        "commentNum",
-        "type",
-        "createdAt",
-      ],
+      attributes: ["id", "contents", "ai_feedback", "likeNum", "commentNum", "type", "createdAt"],
       include: [
         {
           model: this.LikeModel,
@@ -245,8 +226,47 @@ export default class FeedService {
     return feedList;
   }
 
+  async editFeed(id, editData, memberId) {
+    const { dietName, contents } = editData;
+
+    const findInfo = await this.FeedModel.findOne({
+      where: {
+        id,
+      },
+      attributes: ["contents", "memberId"],
+      include: [
+        {
+          model: this.DietModel,
+          as: "feedid",
+          attributes: ["dietName"],
+        },
+      ],
+    });
+
+    //피드 찾기에서 오류
+    if (!findInfo) {
+      throw new Error("해당 피드를 찾을 수 없습니다.");
+    }
+
+    // 피드 작성자가 현재 요청을 보낸 사용자와 동일한지 확인
+    if (findInfo.memberId !== memberId) {
+      throw new Error("이 피드를 수정할 권한이 없습니다.");
+    }
+
+    const result = await findInfo.update({
+      dietName,
+      contents,
+    });
+
+    if (!result) {
+      throw new Error("피드 수정본 업데이트에 실패하였습니다.");
+    }
+
+    return result;
+  }
+
   async deleteFeed(id) {
-    const feedInfo = await this.FeedModel.getOne({
+    const feedInfo = await this.FeedModel.findOne({
       where: {
         id,
       },
@@ -296,14 +316,10 @@ export default class FeedService {
 
   static async uploadToAzure(fileBuffer, blobName, mimeType) {
     // blob stroage client
-    const blobServiceClient = BlobServiceClient.fromConnectionString(
-      process.env.AZURE_CONNECTION
-    );
+    const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_CONNECTION);
 
     // blob storage의 컨테이너 client
-    const containerClient = blobServiceClient.getContainerClient(
-      process.env.AZURE_CONTAINER_NAME
-    );
+    const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_CONTAINER_NAME);
 
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.upload(fileBuffer, fileBuffer.length, {
