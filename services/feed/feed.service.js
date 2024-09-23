@@ -37,7 +37,7 @@ export default class FeedService {
 
       const memberInfo = await this.MemberModel.findOne({
         where: {
-          memberId,
+          id,
         },
       });
 
