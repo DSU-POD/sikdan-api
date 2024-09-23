@@ -65,8 +65,6 @@ export default class FeedService {
     }
   }
 
-  async updateFeedback(aiFeedBack) {}
-
   async like(memberId, feedId) {
     const likeInfo = await this.LikeModel.findOne({
       where: {
@@ -232,8 +230,6 @@ export default class FeedService {
     const findInfo = await this.FeedModel.findOne({
       where: {
         id,
-        memberId,
-        feedId,
       },
       attributes: ["contents", "memberId"],
       include: [
