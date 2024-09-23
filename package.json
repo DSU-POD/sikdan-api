@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.654.0",
     "@azure/storage-blob": "^12.24.0",
     "body-parser": "^1.20.2",
     "cookie-parser": "~1.4.4",
