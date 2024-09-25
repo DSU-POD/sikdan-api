@@ -37,13 +37,18 @@ export default class FeedService {
 
       const memberInfo = await this.MemberModel.findOne({
         where: {
-          id,
+          id: memberId,
         },
       });
 
       const { age, goal } = memberInfo;
 
-      const feedbackContents = await this.feedback(age, goal, foods.join(","), meals);
+      const feedbackContents = await this.feedback(
+        age,
+        goal,
+        foods.join(","),
+        meals
+      );
       await this.FeedModel.update(
         {
           ai_feedback: feedbackContents,
@@ -139,7 +144,13 @@ export default class FeedService {
         {
           model: this.DietModel,
           as: "feedDiet",
-          attributes: ["foods", "nutrient", "total_calories", "url", "dietName"],
+          attributes: [
+            "foods",
+            "nutrient",
+            "total_calories",
+            "url",
+            "dietName",
+          ],
         },
         {
           model: this.CommentModel,
@@ -180,7 +191,15 @@ export default class FeedService {
         type,
       },
 
-      attributes: ["id", "contents", "ai_feedback", "likeNum", "commentNum", "type", "createdAt"],
+      attributes: [
+        "id",
+        "contents",
+        "ai_feedback",
+        "likeNum",
+        "commentNum",
+        "type",
+        "createdAt",
+      ],
       include: [
         {
           model: this.LikeModel,
@@ -320,10 +339,14 @@ export default class FeedService {
 
   static async uploadToAzure(fileBuffer, blobName, mimeType) {
     // blob stroage client
-    const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_CONNECTION);
+    const blobServiceClient = BlobServiceClient.fromConnectionString(
+      process.env.AZURE_CONNECTION
+    );
 
     // blob storage의 컨테이너 client
-    const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_CONTAINER_NAME);
+    const containerClient = blobServiceClient.getContainerClient(
+      process.env.AZURE_CONTAINER_NAME
+    );
 
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.upload(fileBuffer, fileBuffer.length, {
