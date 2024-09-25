@@ -2,11 +2,24 @@ import express from "express";
 import FeedService from "../services/feed/feed.service.js";
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 import JwtStrateGy from "../auth/jwt.strategy.js";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 const router = express.Router();
 const feedService = new FeedService();
 
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
+    );
+  },
+});
 
 const upload = multer({ storage: storage });
 
@@ -32,11 +45,30 @@ router.post("/write", async (req, res, next) => {
 });
 router.post("/predict", upload.single("file"), async (req, res, next) => {
   try {
-    const blobName = Date.now() + path.extname(req.file.originalname);
-    const url = await FeedService.uploadToAzure(req.file.buffer, blobName, req.file.mimetype);
+    const s3 = new S3Client({
+      region: process.env.REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_S3_SECRET_KEY,
+      },
+    });
+    const fileStream = fs.createReadStream(req.file.path);
 
+    const uploadParams = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: req.file.filename,
+      Body: fileStream,
+      //ACL: "public-read", // 퍼블릭 읽기 권한 설정
+    };
+
+    const command = new PutObjectCommand(uploadParams);
+    await s3.send(command);
+    const url = `https://${uploadParams.Bucket}.s3.${process.env.REGION}.amazonaws.com/${uploadParams.Key}`;
+\
     const predict = await feedService.predict(url);
-    console.log(predict);
+    fs.unlink(req.file.path, (err) => {
+      if (err) console.log("file delete error");
+    });
     next({
       message: "정상적으로 업로드 되었습니다.",
       data: {
@@ -45,7 +77,6 @@ router.post("/predict", upload.single("file"), async (req, res, next) => {
       },
     });
   } catch (e) {
-    console.log(e);
     next(e);
   }
 });

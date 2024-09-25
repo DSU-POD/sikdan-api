@@ -216,12 +216,18 @@ export default class FeedService {
     if (tmpFeedList === null) {
       throw new Error("알 수 없는 오류가 발생하였습니다.");
     }
-
+    const totalCount = await this.FeedModel.count({
+      where: {
+        type,
+      },
+    });
     const feedList = tmpFeedList.map((feed) => ({
       ...feed.toJSON(),
       isLike: feed.feedLike.length > 0 ? true : false,
     }));
-    return feedList;
+    feedList.totalCount = totalCount;
+
+    return { feedList, totalCount };
   }
 
   async editFeed(id, editData, memberId) {
