@@ -64,7 +64,6 @@ router.post("/predict", upload.single("file"), async (req, res, next) => {
     const command = new PutObjectCommand(uploadParams);
     await s3.send(command);
     const url = `https://${uploadParams.Bucket}.s3.${process.env.REGION}.amazonaws.com/${uploadParams.Key}`;
-\
     const predict = await feedService.predict(url);
     fs.unlink(req.file.path, (err) => {
       if (err) console.log("file delete error");
