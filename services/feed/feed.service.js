@@ -317,23 +317,22 @@ export default class FeedService {
       }`;
     }
   }
-  async feedback(url) {
+
+  async feedback(age, goal, foods, meals, allergy) {
     const __dirname = path.resolve();
-    const scriptPath = path.join(__dirname, "predict.py");
-    const predict = await new Promise((resolve, reject, err) =>
-      exec(`python3 ${scriptPath} ${url}`, (err, stdout, stderr) => {
+    const scriptPath = path.join(__dirname, "feedback.py");
+    const feedback = await new Promise((resolve, reject, err) =>
+      exec(`python3 ${scriptPath} ${age} ${goal} ${foods} ${meals} ${allergy}`, (err, stdout, stderr) => {
         if (err || stderr) {
-          reject("예측에 실패하였습니다.");
+          reject("피드백에 실패하였습니다.");
         }
         resolve(stdout.trim());
       })
     );
     try {
-      return JSON.parse(predict);
+      return JSON.parse(feedback);
     } catch {
-      return `{
-        foods: [],
-      }`;
+      return "";
     }
   }
 

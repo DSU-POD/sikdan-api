@@ -233,6 +233,9 @@ export class MemberService {
 
   async editInfo(userId, editData) {
     const { height, weight, goal, allergy } = editData || {};
+
+    const editAllergy = allergy.length >= 1 ? JSON.stringify(allergy) : "";
+
     const findInfo = await this.MemberModel.findOne({
       where: {
         userId,
@@ -243,7 +246,7 @@ export class MemberService {
       height,
       weight,
       goal,
-      allergy,
+      allergy: editAllergy,
     });
     if (!result) {
       throw new Error("회원 정보를 업데이트에 실패하였습니다.");
