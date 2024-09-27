@@ -234,7 +234,7 @@ export class MemberService {
   async editInfo(userId, editData) {
     const { height, weight, goal, allergy } = editData || {};
 
-    const editAllergy = allergy.length >= 1 ? JSON.stringify(allergy) : "";
+    const editAllergy = allergy.length >= 1 ? allergy.join(",") : "";
 
     const findInfo = await this.MemberModel.findOne({
       where: {
