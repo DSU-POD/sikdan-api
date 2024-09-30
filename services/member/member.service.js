@@ -58,12 +58,14 @@ export class MemberService {
         email,
       },
     });
-    const { userId } = findInfo;
-    this.sendMail(email, "[MealMate] 아이디 보내드립니다.", `아이디 : ${userId}`);
 
     if (findInfo === null) {
       throw new Error("가입된 회원 정보가 없습니다.");
     }
+
+    const { userId } = findInfo;
+    this.sendMail(email, "[MealMate] 아이디 보내드립니다.", `아이디 : ${userId}`);
+
     return findInfo.userId;
   }
 
@@ -89,10 +91,15 @@ export class MemberService {
         email,
       },
     });
+
+    if (findInfo === null) {
+      throw new Error("가입된 회원 정보가 없습니다.");
+    }
+
     if (findInfo !== null) {
       //있으면 랜덤 패스워드 생성
       const randomPassword = Math.random().toString(36).substring(2, 12);
-      const { encryptPassword, salt } = encryptPassword(randomPassword, salt);
+      const { encryptPassword, salt } = this.encryptPassword(randomPassword, findInfo.salt);
       await this.MemberModel.update(
         {
           password: encryptPassword,
@@ -232,7 +239,7 @@ export class MemberService {
   }
 
   async editInfo(userId, editData) {
-    const { height, weight, goal, allergy } = editData || {};
+    const { height, weight, allergy } = editData || {};
 
     const editAllergy = allergy.length >= 1 ? allergy.join(",") : "";
 
@@ -245,13 +252,24 @@ export class MemberService {
     const result = await findInfo.update({
       height,
       weight,
-      goal,
       allergy: editAllergy,
     });
     if (!result) {
       throw new Error("회원 정보를 업데이트에 실패하였습니다.");
     }
 
+    return result;
+  }
+
+  async editGoal(userId, goal) {
+    const findInfo = await this.MemberModel.findOne({
+      where: {
+        userId,
+      },
+    });
+    const result = await findInfo.update({
+      goal,
+    });
     return result;
   }
 

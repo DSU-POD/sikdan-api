@@ -43,7 +43,7 @@ router.post("/find_password", async function (req, res, next) {
         message: "회원정보에 입력한 이메일로 임시 비밀번호를 발송해드렸습니다.",
       });
     } else {
-      throw new Error();
+      throw new Error("비정상적인 접근입니다.");
     }
   } catch (e) {
     next(e);
@@ -104,6 +104,22 @@ router.patch("/edit", async (req, res, next) => {
     const { userId } = await JwtStrateGy.validateJwt(token);
 
     const memberInfo = await memberService.editInfo(userId, editData);
+    next({
+      data: memberInfo,
+      message: "회원 정보를 수정합니다.",
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.patch("/editGoal", async (req, res, next) => {
+  try {
+    const { goal } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const { userId } = await JwtStrateGy.validateJwt(token);
+
+    const memberInfo = await memberService.editGoal(userId, goal);
     next({
       data: memberInfo,
       message: "회원 정보를 수정합니다.",
