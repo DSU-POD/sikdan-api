@@ -55,7 +55,6 @@ const MemberModel = (sequelize, DataTypes) => {
       },
       allergy: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
     },
     {
