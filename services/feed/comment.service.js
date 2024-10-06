@@ -59,11 +59,10 @@ export default class CommentService {
     return true;
   }
 
-  async update({ commentId, memberId, feedId, contents }) {
+  async update({ id, memberId, contents }) {
     const commentInfo = await this.CommentModel.findOne({
       where: {
-        id: commentId,
-        feedId,
+        id,
         memberId,
       },
     });

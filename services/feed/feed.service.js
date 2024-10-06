@@ -45,7 +45,13 @@ export default class FeedService {
 
       const allergyValue = allergy === "" ? "없음" : allergy;
 
-      const feedbackContents = await this.feedback(age, goal, foods.join(","), meals, allergyValue);
+      const feedbackContents = await this.feedback(
+        age,
+        goal,
+        foods.join(","),
+        meals,
+        allergyValue
+      );
 
       await this.FeedModel.update(
         {
@@ -142,7 +148,13 @@ export default class FeedService {
         {
           model: this.DietModel,
           as: "feedDiet",
-          attributes: ["foods", "nutrient", "total_calories", "url", "dietName"],
+          attributes: [
+            "foods",
+            "nutrient",
+            "total_calories",
+            "url",
+            "dietName",
+          ],
         },
         {
           model: this.CommentModel,
@@ -182,8 +194,17 @@ export default class FeedService {
       where: {
         type,
       },
+      order: [["createdAt", "DESC"]],
 
-      attributes: ["id", "contents", "ai_feedback", "likeNum", "commentNum", "type", "createdAt"],
+      attributes: [
+        "id",
+        "contents",
+        "ai_feedback",
+        "likeNum",
+        "commentNum",
+        "type",
+        "createdAt",
+      ],
       include: [
         {
           model: this.LikeModel,
@@ -306,12 +327,15 @@ export default class FeedService {
     const __dirname = path.resolve();
     const scriptPath = path.join(__dirname, "feedback.py");
     const feedback = await new Promise((resolve, reject, err) =>
-      exec(`python3 ${scriptPath} ${age} ${goal} ${foods} ${meals} ${allergy}`, (err, stdout, stderr) => {
-        if (err || stderr) {
-          reject("피드백에 실패하였습니다.");
+      exec(
+        `python3 ${scriptPath} ${age} ${goal} ${foods} ${meals} ${allergy}`,
+        (err, stdout, stderr) => {
+          if (err || stderr) {
+            reject("피드백에 실패하였습니다.");
+          }
+          resolve(stdout.trim());
         }
-        resolve(stdout.trim());
-      })
+      )
     );
     try {
       return feedback;
@@ -322,10 +346,14 @@ export default class FeedService {
 
   static async uploadToAzure(fileBuffer, blobName, mimeType) {
     // blob stroage client
-    const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_CONNECTION);
+    const blobServiceClient = BlobServiceClient.fromConnectionString(
+      process.env.AZURE_CONNECTION
+    );
 
     // blob storage의 컨테이너 client
-    const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_CONTAINER_NAME);
+    const containerClient = blobServiceClient.getContainerClient(
+      process.env.AZURE_CONTAINER_NAME
+    );
 
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.upload(fileBuffer, fileBuffer.length, {
