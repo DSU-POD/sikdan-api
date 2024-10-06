@@ -154,6 +154,7 @@ export default class FeedService {
             "total_calories",
             "url",
             "dietName",
+            "meals",
           ],
         },
         {
