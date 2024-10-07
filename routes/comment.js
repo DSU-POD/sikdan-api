@@ -30,17 +30,18 @@ router.post("/add", async (req, res, next) => {
 });
 router.patch("/edit/:id", async (req, res, next) => {
   try {
-    const { id: commentId } = req.params;
-    const { feedId, memberId, contents } = req.body;
+    const { id } = req.params;
+    const { contents } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const { memberId } = await JwtStrateGy.validateJwt(token);
 
-    if (!commentId || !feedId) {
+    if (!id) {
       throw new Error("비정상적인 접근입니다.");
     }
 
     await commentService.update({
-      commentId,
+      id,
       memberId,
-      feedId,
       contents,
     });
     next({
@@ -53,7 +54,9 @@ router.patch("/edit/:id", async (req, res, next) => {
 router.delete("/delete/:id", async (req, res, next) => {
   try {
     const { id: commentId } = req.params;
-    const { feedId, memberId } = req.body;
+    const { feedId } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const { memberId } = await JwtStrateGy.validateJwt(token);
 
     if (!commentId || !feedId) {
       throw new Error("비정상적인 접근입니다.");
