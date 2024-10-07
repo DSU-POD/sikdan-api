@@ -86,7 +86,6 @@ export default class FeedService {
     }
     const feedInfo = await this.FeedModel.findOne({
       where: {
-        memberId,
         id: feedId,
       },
     });
@@ -113,7 +112,6 @@ export default class FeedService {
     }
     const feedInfo = await this.FeedModel.findOne({
       where: {
-        memberId,
         id: feedId,
       },
     });
