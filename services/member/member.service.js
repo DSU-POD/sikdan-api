@@ -226,7 +226,7 @@ export class MemberService {
 
   async information(userId) {
     const idInfo = await this.MemberModel.findOne({
-      attributes: ["age", "height", "weight", "goal", "allergy"],
+      attributes: ["age", "height", "weight", "goal", "allergy", "nickname"],
       where: {
         userId,
       },
@@ -240,7 +240,6 @@ export class MemberService {
 
   async editInfo(userId, editData) {
     const { height, weight, allergy } = editData || {};
-
     const editAllergy = allergy.length >= 1 ? allergy.join(",") : "";
 
     const findInfo = await this.MemberModel.findOne({
