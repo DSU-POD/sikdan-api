@@ -12,7 +12,7 @@ React, Next.JS, React-native 을 이용해 만든 프론트엔드 환경에 API�
 
 - [Features](#features)
 - [Technologies](#technologies)
-- [API Docs] (#apidocument)
+- [API Docs](#apidocument)
 
 ## Features
 
@@ -24,11 +24,11 @@ React, Next.JS, React-native 을 이용해 만든 프론트엔드 환경에 API�
 
 ## Technologies
 
-- **Node.js, **Express****: 백엔드 환경
-- **MySQL**: 데이터베이스
-- **Sequelize**: ORM
-- **AWS S3**: 식단 사진이 업로드 된 스토리지
+- **Node.js, Express*** : 백엔드 환경
+- **MySQL** : 데이터베이스
+- **Sequelize** : ORM
+- **AWS S3** : 식단 사진이 업로드 된 스토리지
 
 
 ## API DOCS
-[#https://dsupod.gitbook.io/dsupod]
+[https://dsupod.gitbook.io/dsupod]
