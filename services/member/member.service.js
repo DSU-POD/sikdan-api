@@ -6,6 +6,8 @@ import JwtStrateGy from "../../auth/jwt.strategy.js";
 export class MemberService {
   constructor() {
     this.MemberModel = db.MemberModel;
+    this.FeedModel = db.FeedModel;
+    this.DietModel = db.DietModel;
   }
 
   //비밀번호 암호화
@@ -64,7 +66,11 @@ export class MemberService {
     }
 
     const { userId } = findInfo;
-    this.sendMail(email, "[MealMate] 아이디 보내드립니다.", `아이디 : ${userId}`);
+    this.sendMail(
+      email,
+      "[MealMate] 아이디 보내드립니다.",
+      `아이디 : ${userId}`
+    );
 
     return findInfo.userId;
   }
@@ -99,7 +105,10 @@ export class MemberService {
     if (findInfo !== null) {
       //있으면 랜덤 패스워드 생성
       const randomPassword = Math.random().toString(36).substring(2, 12);
-      const { encryptPassword, salt } = this.encryptPassword(randomPassword, findInfo.salt);
+      const { encryptPassword, salt } = this.encryptPassword(
+        randomPassword,
+        findInfo.salt
+      );
       await this.MemberModel.update(
         {
           password: encryptPassword,
@@ -113,13 +122,28 @@ export class MemberService {
         }
       );
 
-      this.sendMail(email, "[MealMate] 임시 비밀번호 보내드립니다.", `임시 비밀번호 : ${randomPassword}`);
+      this.sendMail(
+        email,
+        "[MealMate] 임시 비밀번호 보내드립니다.",
+        `임시 비밀번호 : ${randomPassword}`
+      );
     }
     return true;
   }
 
   async register(registerData) {
-    const { userId, password, email, nickname, gender, age, height, weight, goal, trainer_yn } = registerData;
+    const {
+      userId,
+      password,
+      email,
+      nickname,
+      gender,
+      age,
+      height,
+      weight,
+      goal,
+      trainer_yn,
+    } = registerData;
 
     const checkId = await this.MemberModel.findOne({
       //id 중복 체크
@@ -224,12 +248,32 @@ export class MemberService {
     }
   }
 
-  async information(userId) {
+  async information(memberId) {
     const idInfo = await this.MemberModel.findOne({
-      attributes: ["age", "height", "weight", "goal", "allergy", "nickname", "email"],
+      attributes: [
+        "age",
+        "height",
+        "weight",
+        "goal",
+        "allergy",
+        "nickname",
+        "email",
+      ],
       where: {
-        userId,
+        id: memberId,
       },
+      include: [
+        {
+          model: this.FeedModel,
+          as: "memberFeed",
+          attributes: ["likeNum", "commentNum"],
+          include: {
+            model: this.DietModel,
+            as: "feedDiet",
+            attributes: ["url"],
+          },
+        },
+      ],
     });
     if (idInfo === null) {
       throw new Error("알 수 없는 오류가 발생하였습니다.");
@@ -281,7 +325,10 @@ export class MemberService {
 
     //새로운 패스워드, 암호화 하고 저장
     if (findInfo.password !== newPassword) {
-      const { encryptPassword, salt } = this.encryptPassword(newPassword, findInfo.salt);
+      const { encryptPassword, salt } = this.encryptPassword(
+        newPassword,
+        findInfo.salt
+      );
       const result = await findInfo.update({
         password: encryptPassword,
         salt,
