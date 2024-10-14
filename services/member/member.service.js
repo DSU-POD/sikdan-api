@@ -258,6 +258,7 @@ export class MemberService {
         "allergy",
         "nickname",
         "email",
+        "trainer_yn",
       ],
       where: {
         id: memberId,
@@ -266,7 +267,7 @@ export class MemberService {
         {
           model: this.FeedModel,
           as: "memberFeed",
-          attributes: ["likeNum", "commentNum"],
+          attributes: ["id"],
           include: {
             model: this.DietModel,
             as: "feedDiet",
