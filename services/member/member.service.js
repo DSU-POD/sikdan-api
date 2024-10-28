@@ -259,6 +259,7 @@ export class MemberService {
         "nickname",
         "email",
         "trainer_yn",
+        "gender",
       ],
       where: {
         id: memberId,
