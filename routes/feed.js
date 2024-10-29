@@ -14,10 +14,7 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
-    );
+    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
   },
 });
 
@@ -79,6 +76,7 @@ router.post("/predict", upload.single("file"), async (req, res, next) => {
     next(e);
   }
 });
+
 router.post("/like", async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -173,6 +171,26 @@ router.delete("/delete/:id", async (req, res, next) => {
     next({
       data: post,
       message: "삭제 되었습니다.",
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.post("/report", async (req, res, next) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = await JwtStrateGy.validateJwt(token);
+    const memberId = decoded.memberId;
+    const { feedId } = req.body;
+    if (!memberId || !feedId) {
+      // 회원 또는 피드 없으면 퇴각
+      throw new Error("비정상적인 접근입니다.");
+    }
+    const report = await feedService.report(memberId, feedId);
+    next({
+      data: report,
+      message: "게시물이 신고 되었습니다.",
     });
   } catch (e) {
     next(e);
