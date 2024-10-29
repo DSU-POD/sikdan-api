@@ -45,13 +45,7 @@ export default class FeedService {
 
       const allergyValue = allergy === "" ? "없음" : allergy;
 
-      const feedbackContents = await this.feedback(
-        age,
-        goal,
-        foods.join(","),
-        meals,
-        allergyValue
-      );
+      const feedbackContents = await this.feedback(age, goal, foods.join(","), meals, allergyValue);
 
       await this.FeedModel.update(
         {
@@ -146,14 +140,7 @@ export default class FeedService {
         {
           model: this.DietModel,
           as: "feedDiet",
-          attributes: [
-            "foods",
-            "nutrient",
-            "total_calories",
-            "url",
-            "dietName",
-            "meals",
-          ],
+          attributes: ["foods", "nutrient", "total_calories", "url", "dietName", "meals"],
         },
         {
           model: this.CommentModel,
@@ -195,15 +182,7 @@ export default class FeedService {
       },
       order: [["createdAt", "DESC"]],
 
-      attributes: [
-        "id",
-        "contents",
-        "ai_feedback",
-        "likeNum",
-        "commentNum",
-        "type",
-        "createdAt",
-      ],
+      attributes: ["id", "contents", "ai_feedback", "likeNum", "commentNum", "type", "createdAt"],
       include: [
         {
           model: this.LikeModel,
@@ -326,15 +305,12 @@ export default class FeedService {
     const __dirname = path.resolve();
     const scriptPath = path.join(__dirname, "feedback.py");
     const feedback = await new Promise((resolve, reject, err) =>
-      exec(
-        `python3 ${scriptPath} ${age} ${goal} ${foods} ${meals} ${allergy}`,
-        (err, stdout, stderr) => {
-          if (err || stderr) {
-            reject("피드백에 실패하였습니다.");
-          }
-          resolve(stdout.trim());
+      exec(`python3 ${scriptPath} ${age} ${goal} ${foods} ${meals} ${allergy}`, (err, stdout, stderr) => {
+        if (err || stderr) {
+          reject("피드백에 실패하였습니다.");
         }
-      )
+        resolve(stdout.trim());
+      })
     );
     try {
       return feedback;
@@ -345,14 +321,10 @@ export default class FeedService {
 
   static async uploadToAzure(fileBuffer, blobName, mimeType) {
     // blob stroage client
-    const blobServiceClient = BlobServiceClient.fromConnectionString(
-      process.env.AZURE_CONNECTION
-    );
+    const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_CONNECTION);
 
     // blob storage의 컨테이너 client
-    const containerClient = blobServiceClient.getContainerClient(
-      process.env.AZURE_CONTAINER_NAME
-    );
+    const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_CONTAINER_NAME);
 
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.upload(fileBuffer, fileBuffer.length, {
@@ -360,5 +332,37 @@ export default class FeedService {
     });
 
     return blockBlobClient.url;
+  }
+
+  async report(memberId, feedId) {
+    const reportInfo = await this.ReportModel.findOne({
+      where: {
+        memberId,
+        feedId,
+      },
+    });
+    if (reportInfo !== null) {
+      throw new Error("이미 신고 했습니다.");
+    }
+    const feedInfo = await this.FeedModel.findOne({
+      where: {
+        id: feedId,
+      },
+    });
+
+    // report 테이블에 create
+    const reportResult = await this.ReportModel.create({ memberId, feedId });
+    if (reportResult === null) {
+      throw new Error("알 수 없는 오류가 발생하였습니다.");
+    }
+
+    //Feed 테이블에 ReportNum 에 +1 업데이트
+    await feedInfo.increment("ReportNum", { by: 1 });
+
+    //Feed 테이블에 ReportNum이 5개 이상이면 게시물 삭제
+    if (feedInfo.ReportNum + 1 >= 5) {
+      await feedInfo.destroy();
+    }
+    return true;
   }
 }
