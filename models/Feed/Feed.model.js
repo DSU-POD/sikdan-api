@@ -42,7 +42,12 @@ const FeedModel = (sequelize, DataTypes) => {
         defaultValue: "expert",
         allowNull: false,
       },
-      // 기타 필드
+      ReportNum: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+        // 기타 필드
+      },
     },
     {
       sequelize,
@@ -72,6 +77,11 @@ const FeedModel = (sequelize, DataTypes) => {
       foreignKey: "feedId",
       sourceKey: "id",
       as: "feedComment",
+    });
+    Feed.hasMany(models.ReportModel, {
+      foreignKey: "feedId",
+      sourceKey: "id",
+      as: "feedReport",
     });
   };
 
