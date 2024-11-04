@@ -334,7 +334,7 @@ export default class FeedService {
     return blockBlobClient.url;
   }
 
-  async report(memberId, feedId) {
+  async report({ memberId, feedId, reason }) {
     const reportInfo = await this.ReportModel.findOne({
       where: {
         memberId,
@@ -351,7 +351,7 @@ export default class FeedService {
     });
 
     // report 테이블에 create
-    const reportResult = await this.ReportModel.create({ memberId, feedId });
+    const reportResult = await this.ReportModel.create({ memberId, feedId, reason });
     if (reportResult === null) {
       throw new Error("알 수 없는 오류가 발생하였습니다.");
     }
