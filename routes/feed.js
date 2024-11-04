@@ -182,12 +182,12 @@ router.post("/report", async (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
     const decoded = await JwtStrateGy.validateJwt(token);
     const memberId = decoded.memberId;
-    const { feedId } = req.body;
-    if (!memberId || !feedId) {
+    const { feedId, reason } = req.body;
+    if (!memberId || !feedId || !reason) {
       // 회원 또는 피드 없으면 퇴각
       throw new Error("비정상적인 접근입니다.");
     }
-    const report = await feedService.report(memberId, feedId);
+    const report = await feedService.report({ memberId, feedId, reason });
     next({
       data: report,
       message: "게시물이 신고 되었습니다.",
