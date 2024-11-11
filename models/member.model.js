@@ -21,7 +21,7 @@ const MemberModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      trainer_yn: {
+      trainerYn: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -55,6 +55,18 @@ const MemberModel = (sequelize, DataTypes) => {
       },
       allergy: {
         type: DataTypes.STRING,
+      },
+      naver_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      workOut: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      totalCalories: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
       },
     },
     {
