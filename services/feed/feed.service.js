@@ -11,6 +11,7 @@ export default class FeedService {
     this.MemberModel = db.MemberModel;
     this.DietModel = db.DietModel;
     this.CommentModel = db.CommentModel;
+    this.ReportModel = db.ReportModel;
     this.sequelize = db.sequelize;
   }
 
@@ -45,7 +46,13 @@ export default class FeedService {
 
       const allergyValue = allergy === "" ? "없음" : allergy;
 
-      const feedbackContents = await this.feedback(age, goal, foods.join(","), meals, allergyValue);
+      const feedbackContents = await this.feedback(
+        age,
+        goal,
+        foods.join(","),
+        meals,
+        allergyValue
+      );
 
       await this.FeedModel.update(
         {
@@ -140,7 +147,14 @@ export default class FeedService {
         {
           model: this.DietModel,
           as: "feedDiet",
-          attributes: ["foods", "nutrient", "total_calories", "url", "dietName", "meals"],
+          attributes: [
+            "foods",
+            "nutrient",
+            "total_calories",
+            "url",
+            "dietName",
+            "meals",
+          ],
         },
         {
           model: this.CommentModel,
@@ -182,7 +196,15 @@ export default class FeedService {
       },
       order: [["createdAt", "DESC"]],
 
-      attributes: ["id", "contents", "ai_feedback", "likeNum", "commentNum", "type", "createdAt"],
+      attributes: [
+        "id",
+        "contents",
+        "ai_feedback",
+        "likeNum",
+        "commentNum",
+        "type",
+        "createdAt",
+      ],
       include: [
         {
           model: this.LikeModel,
@@ -239,14 +261,6 @@ export default class FeedService {
       where: {
         id,
       },
-      attributes: ["contents", "memberId"],
-      include: [
-        {
-          model: this.DietModel,
-          as: "feedId",
-          attributes: ["dietName"],
-        },
-      ],
     });
 
     //피드 찾기에서 오류
@@ -258,12 +272,20 @@ export default class FeedService {
     if (findInfo.memberId !== memberId) {
       throw new Error("이 피드를 수정할 권한이 없습니다.");
     }
+    await this.DietModel.update(
+      {
+        dietName,
+      },
+      {
+        where: {
+          id: findInfo.dietId,
+        },
+      }
+    );
 
     const result = await findInfo.update({
-      dietName,
       contents,
     });
-
     if (!result) {
       throw new Error("피드 수정본 업데이트에 실패하였습니다.");
     }
@@ -305,12 +327,15 @@ export default class FeedService {
     const __dirname = path.resolve();
     const scriptPath = path.join(__dirname, "feedback.py");
     const feedback = await new Promise((resolve, reject, err) =>
-      exec(`python3 ${scriptPath} ${age} ${goal} ${foods} ${meals} ${allergy}`, (err, stdout, stderr) => {
-        if (err || stderr) {
-          reject("피드백에 실패하였습니다.");
+      exec(
+        `python3 ${scriptPath} ${age} ${goal} ${foods} ${meals} ${allergy}`,
+        (err, stdout, stderr) => {
+          if (err || stderr) {
+            reject("피드백에 실패하였습니다.");
+          }
+          resolve(stdout.trim());
         }
-        resolve(stdout.trim());
-      })
+      )
     );
     try {
       return feedback;
@@ -321,10 +346,14 @@ export default class FeedService {
 
   static async uploadToAzure(fileBuffer, blobName, mimeType) {
     // blob stroage client
-    const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_CONNECTION);
+    const blobServiceClient = BlobServiceClient.fromConnectionString(
+      process.env.AZURE_CONNECTION
+    );
 
     // blob storage의 컨테이너 client
-    const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_CONTAINER_NAME);
+    const containerClient = blobServiceClient.getContainerClient(
+      process.env.AZURE_CONTAINER_NAME
+    );
 
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.upload(fileBuffer, fileBuffer.length, {
@@ -351,7 +380,11 @@ export default class FeedService {
     });
 
     // report 테이블에 create
-    const reportResult = await this.ReportModel.create({ memberId, feedId, reason });
+    const reportResult = await this.ReportModel.create({
+      memberId,
+      feedId,
+      reason,
+    });
     if (reportResult === null) {
       throw new Error("알 수 없는 오류가 발생하였습니다.");
     }
@@ -360,7 +393,7 @@ export default class FeedService {
     await feedInfo.increment("ReportNum", { by: 1 });
 
     //Feed 테이블에 ReportNum이 5개 이상이면 게시물 삭제
-    if (feedInfo.ReportNum + 1 >= 5) {
+    if (feedInfo.ReportNum >= 5) {
       await feedInfo.destroy();
     }
     return true;
